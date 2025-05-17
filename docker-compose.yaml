@@ -1,0 +1,22 @@
+#  Utility containers
+services:
+  composer:
+    build:
+      context: .
+      dockerfile: infra/utility/composer/Dockerfile
+    volumes:
+      - ./src:/var/www/html:delegated
+
+  artisan:
+    build:
+      context: .
+      dockerfile: infra/utility/artisan/Dockerfile
+    volumes:
+      - ./src:/var/www/html:delegated
+
+  npm:
+    build:
+      context: .
+      dockerfile: infra/utility/npm/Dockerfile
+    volumes:
+      - ./src:/var/www/html:delegated
