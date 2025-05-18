@@ -17,3 +17,8 @@ use Illuminate\Support\Facades\Route;
 
 // Weather endpoints
 Route::get('/weather', [WeatherController::class, 'getCurrentWeather']);
+
+// Subscription endpoints
+Route::post('/subscribe', [SubscriptionController::class, 'subscribe']);
+Route::get('/confirm/{token}', [SubscriptionController::class, 'confirm']);
+Route::get('/unsubscribe/{token}', [SubscriptionController::class, 'unsubscribe']);
