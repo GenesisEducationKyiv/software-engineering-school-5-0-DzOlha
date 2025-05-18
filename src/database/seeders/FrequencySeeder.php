@@ -11,8 +11,8 @@ class FrequencySeeder extends Seeder
     public function run(): void
     {
         $frequencies = [
-            'Hourly' => 60,
-            'Daily' => 1440
+            'hourly' => 60,
+            'daily' => 1440
         ];
 
         foreach ($frequencies as $label => $minutes) {

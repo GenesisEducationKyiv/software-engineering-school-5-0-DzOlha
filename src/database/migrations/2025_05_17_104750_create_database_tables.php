@@ -20,7 +20,7 @@ return new class extends Migration
 
         Schema::create('cities', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->string('name', 50);
             $table->string('country')->nullable();
             $table->timestamp('created_at')->useCurrent();
         });
@@ -28,7 +28,7 @@ return new class extends Migration
 
         Schema::create('frequencies', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->string('name', 50);
             $table->unsignedInteger('interval_minutes');
             $table->timestamps();
         });
@@ -56,7 +56,7 @@ return new class extends Migration
         Schema::create('subscription_tokens', function (Blueprint $table) {
             $table->id();
             $table->foreignId('subscription_id')->constrained('subscriptions')->onDelete('cascade');
-            $table->string('token')->unique();
+            $table->string('token', 64)->unique();
             $table->enum('type', ['confirm', 'cancel']);
             $table->timestamp('expires_at')->nullable();
             $table->timestamps();
