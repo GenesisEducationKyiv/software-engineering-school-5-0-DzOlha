@@ -1,12 +1,7 @@
 <?php
 
-namespace App\Domains\Subscription\Model;
+namespace App\Models;
 
-use App\Domains\City\Model\City;
-use App\Domains\Frequency\Model\Frequency;
-use App\Domains\SubscriptionEmail\Model\SubscriptionEmail;
-use App\Domains\SubscriptionToken\Model\SubscriptionToken;
-use App\Domains\User\Model\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -40,5 +35,10 @@ class Subscription extends Model
     public function tokens(): HasMany
     {
         return $this->hasMany(SubscriptionToken::class);
+    }
+
+    public function isActive(): bool
+    {
+        return $this->status === 'active';
     }
 }

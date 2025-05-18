@@ -13,20 +13,7 @@ services:
       - ./php/.env
     restart: unless-stopped
 
-  scheduler:
-    build:
-      context: ../../
-      dockerfile: infra/prod/php/Dockerfile
-    working_dir: /var/www/html
-    command: ["php", "artisan", "schedule:work"]
-    depends_on:
-      - php
-      - redis
-    env_file:
-      - ./php/.env
-    restart: unless-stopped
-
-  mailer:
+  queue-runner:
     build:
       context: ../../
       dockerfile: infra/prod/php/Dockerfile
@@ -38,6 +25,13 @@ services:
     env_file:
       - ./php/.env
     restart: unless-stopped
+
+  mailpit:
+    image: axllent/mailpit
+    container_name: mailpit
+    ports:
+      - "1025:1025"  # SMTP
+      - "8025:8025"  # Web UI
 
   nginx:
     build:

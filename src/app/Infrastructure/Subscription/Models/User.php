@@ -1,14 +1,15 @@
 <?php
 
-namespace App\Domains\Frequency\Model;
+namespace App\Models;
 
-use App\Domains\Subscription\Model\Subscription;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Frequency extends Model
+class User extends Model
 {
-    protected $fillable = ['name', 'interval_minutes'];
+    public $timestamps = false;
+
+    protected $fillable = ['email'];
 
     public function subscriptions(): HasMany
     {

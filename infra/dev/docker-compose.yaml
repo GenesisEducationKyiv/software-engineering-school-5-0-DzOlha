@@ -16,22 +16,7 @@ services:
     env_file:
       - ./php/.env
 
-  scheduler:
-    build:
-      context: ../../
-      dockerfile: infra/dev/php/Dockerfile
-    working_dir: /var/www/html
-    command: [ "sh", "-c", "php artisan schedule:work" ]
-    volumes:
-      - ../../src:/var/www/html
-      - ./php/.env:/var/www/html/.env
-    env_file:
-      - ./php/.env
-    depends_on:
-      - php
-      - redis
-
-  mailer:
+  queue-runner:
     build:
       context: ../../
       dockerfile: infra/dev/php/Dockerfile
@@ -45,6 +30,13 @@ services:
     depends_on:
       - php
       - redis
+
+  mailpit:
+    image: axllent/mailpit
+    container_name: mailpit
+    ports:
+      - "1025:1025"  # SMTP
+      - "8025:8025"  # Web UI
 
   nginx:
     build:
