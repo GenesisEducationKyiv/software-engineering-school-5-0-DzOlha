@@ -12,6 +12,7 @@ use App\Domain\Subscription\ValueObjects\Token;
 use App\Exceptions\Custom\ApiAccessException;
 use App\Exceptions\Custom\CityNotFoundException;
 use App\Exceptions\Custom\EmailAlreadySubscribedException;
+use App\Exceptions\Custom\FrequencyNotFoundException;
 use App\Exceptions\Custom\SubscriptionAlreadyPendingException;
 use App\Exceptions\Custom\TokenNotFoundException;
 use App\Exceptions\ValidationException;
@@ -46,7 +47,8 @@ class SubscriptionController extends Controller
             CityNotFoundException |
             EmailAlreadySubscribedException |
             SubscriptionAlreadyPendingException |
-            ApiAccessException $e
+            ApiAccessException |
+            FrequencyNotFoundException $e
         ) {
             return $this->errorResponse($e);
         }

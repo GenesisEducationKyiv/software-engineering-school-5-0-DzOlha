@@ -3,14 +3,20 @@
 namespace App\Domain\Subscription\Repositories;
 
 use App\Domain\Subscription\Entities\Subscription;
-use App\Domain\Subscription\ValueObjects\Email;
+use App\Domain\Subscription\Entities\Subscription as SubscriptionEntity;
 use App\Domain\Subscription\ValueObjects\Token;
-use App\Infrastructure\Subscription\Models\SubscriptionToken;
+use App\Exceptions\Custom\FrequencyNotFoundException;
 use App\Infrastructure\Subscription\Models\Subscription as SubscriptionModel;
 
 interface SubscriptionRepositoryInterface
 {
+    /**
+     * @param SubscriptionEntity $subscriptionEntity
+     * @return SubscriptionEntity
+     * @throws FrequencyNotFoundException
+     */
     public function save(Subscription $subscriptionEntity): Subscription;
+
     public function hasActiveSubscription(Subscription $subscription): bool;
     public function findSubscriptionById(int $id): ?Subscription;
     public function getPendingSubscription(Subscription $subscription): ?SubscriptionModel;

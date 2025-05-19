@@ -7,7 +7,6 @@ use App\Application\Subscription\DTOs\UnsubscribeRequestDTO;
 use App\Domain\Subscription\Entities\Subscription;
 use App\Domain\Subscription\Events\SubscriptionConfirmed;
 use App\Domain\Subscription\Events\SubscriptionCreated;
-use App\Domain\Subscription\Events\SubscriptionUnsubscribed;
 use App\Domain\Subscription\Repositories\SubscriptionRepositoryInterface;
 use App\Domain\Subscription\ValueObjects\Email;
 use App\Domain\Subscription\ValueObjects\Frequency;
@@ -17,6 +16,7 @@ use App\Domain\Weather\ValueObjects\City;
 use App\Exceptions\Custom\ApiAccessException;
 use App\Exceptions\Custom\CityNotFoundException;
 use App\Exceptions\Custom\EmailAlreadySubscribedException;
+use App\Exceptions\Custom\FrequencyNotFoundException;
 use App\Exceptions\Custom\SubscriptionAlreadyPendingException;
 use App\Exceptions\Custom\TokenNotFoundException;
 
@@ -33,6 +33,7 @@ class SubscriptionService
      * @throws EmailAlreadySubscribedException
      * @throws SubscriptionAlreadyPendingException
      * @throws ApiAccessException
+     * @throws FrequencyNotFoundException
      */
     public function subscribe(Email $email, City $city, Frequency $frequency): Subscription
     {
@@ -111,8 +112,6 @@ class SubscriptionService
         if (!$removedSubscription) {
             throw new TokenNotFoundException();
         }
-
-//        SubscriptionUnsubscribed::dispatch($removedSubscription);
 
         return true;
     }

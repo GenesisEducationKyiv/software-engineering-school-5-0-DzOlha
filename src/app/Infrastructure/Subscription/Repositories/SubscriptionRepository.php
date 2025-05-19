@@ -9,16 +9,21 @@ use App\Domain\Subscription\ValueObjects\Frequency as FrequencyValueObject;
 use App\Domain\Subscription\ValueObjects\Status;
 use App\Domain\Subscription\ValueObjects\Token as TokenValueObject;
 use App\Domain\Weather\ValueObjects\City as CityValueObject;
+use App\Exceptions\Custom\FrequencyNotFoundException;
 use App\Infrastructure\Subscription\Models\City;
 use App\Infrastructure\Subscription\Models\Frequency;
 use App\Infrastructure\Subscription\Models\Subscription;
 use App\Infrastructure\Subscription\Models\SubscriptionToken;
 use App\Infrastructure\Subscription\Models\User;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 class SubscriptionRepository implements SubscriptionRepositoryInterface
 {
+    /**
+     * @param SubscriptionEntity $subscriptionEntity
+     * @return SubscriptionEntity
+     * @throws FrequencyNotFoundException
+     */
     public function save(SubscriptionEntity $subscriptionEntity): SubscriptionEntity
     {
         return DB::transaction(function () use ($subscriptionEntity) {
@@ -31,6 +36,9 @@ class SubscriptionRepository implements SubscriptionRepositoryInterface
             ]);
 
             $frequency = Frequency::where('name', $subscriptionEntity->getFrequency()->getName())->first();
+            if (!$frequency) {
+                throw new FrequencyNotFoundException();
+            }
 
             $subscription = new Subscription([
                 'user_id'      => $user->id,

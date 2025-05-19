@@ -9,6 +9,7 @@ COPY ./infra/prod/nginx/nginx.conf /etc/nginx/nginx.conf
 WORKDIR /var/www/html
 
 COPY ./src/public/ ./public
+COPY ./src/resources ./resources
 
 EXPOSE 80
 
