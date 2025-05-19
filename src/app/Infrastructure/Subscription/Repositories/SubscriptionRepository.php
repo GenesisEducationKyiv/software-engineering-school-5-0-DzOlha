@@ -30,11 +30,6 @@ class SubscriptionRepository implements SubscriptionRepositoryInterface
                 'name' => $subscriptionEntity->getCity()->getName()
             ]);
 
-            if ($subscriptionEntity->getCity()->getCountry()) {
-                $city->country = $subscriptionEntity->getCity()->getCountry();
-                $city->save();
-            }
-
             $frequency = Frequency::where('name', $subscriptionEntity->getFrequency()->getName())->first();
 
             $subscription = new Subscription([
@@ -146,7 +141,6 @@ class SubscriptionRepository implements SubscriptionRepositoryInterface
             ->where('users.email', $subscription->getEmail()->getValue())
             ->where('cities.name', $subscription->getCity()->getName())
             ->where('frequencies.name', $subscription->getFrequency()->getName())
-            ->when($subscription->getCity()->getCountry(), fn($q) => $q->where('cities.country', $subscription->getCity()->getCountry()))
             ->where('subscriptions.status', 'active')
             ->exists();
     }
@@ -160,8 +154,6 @@ class SubscriptionRepository implements SubscriptionRepositoryInterface
             ->where('users.email', $subscription->getEmail()->getValue())
             ->where('cities.name', $subscription->getCity()->getName())
             ->where('frequencies.name', $subscription->getFrequency()->getName())
-            ->when($subscription->getCity()->getCountry(), fn($q) => $q->where('cities.country', $subscription->getCity()->getCountry())
-            )
             ->where('subscriptions.status', 'pending')
             ->select('subscriptions.*')
             ->first();

@@ -13,19 +13,18 @@ use App\Exceptions\Custom\CityNotFoundException;
 use App\Exceptions\Custom\EmailAlreadySubscribedException;
 use App\Exceptions\Custom\SubscriptionAlreadyPendingException;
 use App\Exceptions\Custom\TokenNotFoundException;
+use App\Exceptions\ValidationException;
 use App\Interfaces\Api\Requests\SubscribeRequest;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Routing\Controller;
-use Symfony\Component\HttpFoundation\Response;
+use App\Http\Controllers\Controller;
 
 class SubscriptionController extends Controller
 {
     public function __construct(
-        private readonly CreateSubscriptionCommand $createSubscriptionCommand,
+        private readonly CreateSubscriptionCommand  $createSubscriptionCommand,
         private readonly ConfirmSubscriptionCommand $confirmSubscriptionCommand,
-        private readonly UnsubscribeCommand $unsubscribeCommand
-    ) {
-    }
+        private readonly UnsubscribeCommand         $unsubscribeCommand
+    ){}
 
     /**
      * POST /subscribe
@@ -42,28 +41,13 @@ class SubscriptionController extends Controller
 
         try {
             $this->createSubscriptionCommand->execute($dto);
-        }
-        catch (\InvalidArgumentException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage(),
-            ], Response::HTTP_BAD_REQUEST);
-        }
-        catch (
-            CityNotFoundException |
-            EmailAlreadySubscribedException |
-            SubscriptionAlreadyPendingException $e
-        ) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage(),
-            ], $e->getStatusCode());
+        } catch (ValidationException|CityNotFoundException|EmailAlreadySubscribedException|SubscriptionAlreadyPendingException $e) {
+            return $this->errorResponse($e);
         }
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Subscription successful. Confirmation email sent.',
-        ], Response::HTTP_OK);
+        return $this->successResponse(
+            'Subscription successful. Confirmation email sent. Please check your inbox.'
+        );
     }
 
     /**
@@ -73,30 +57,18 @@ class SubscriptionController extends Controller
      */
     public function confirm(string $token): JsonResponse
     {
-        $dto = new ConfirmSubscriptionRequestDTO(
-            Token::confirmation($token)
-        );
-
         try {
+            $dto = new ConfirmSubscriptionRequestDTO(
+                Token::confirmation($token)
+            );
             $this->confirmSubscriptionCommand->execute($dto);
-        }
-        catch (\InvalidArgumentException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage(),
-            ], Response::HTTP_BAD_REQUEST);
-        }
-        catch (TokenNotFoundException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage(),
-            ], $e->getStatusCode());
+        } catch (ValidationException|TokenNotFoundException $e) {
+            return $this->errorResponse($e);
         }
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Subscription confirmed successfully.',
-        ]);
+        return $this->successResponse(
+            'Subscription confirmed. You will now receive weather updates.'
+        );
     }
 
     /**
@@ -106,29 +78,18 @@ class SubscriptionController extends Controller
      */
     public function unsubscribe(string $token): JsonResponse
     {
-        $dto = new UnsubscribeRequestDTO(
-            Token::cancel($token)
-        );
-
         try {
+            $dto = new UnsubscribeRequestDTO(
+                Token::cancel($token)
+            );
+
             $this->unsubscribeCommand->execute($dto);
-        }
-        catch (\InvalidArgumentException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage(),
-            ], Response::HTTP_BAD_REQUEST);
-        }
-        catch (TokenNotFoundException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage(),
-            ], $e->getStatusCode());
+        } catch (ValidationException|TokenNotFoundException $e) {
+            return $this->errorResponse($e);
         }
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Unsubscribed successfully.',
-        ]);
+        return $this->successResponse(
+            'You have been unsubscribed from weather updates.'
+        );
     }
 }

@@ -21,14 +21,13 @@ return new class extends Migration
         Schema::create('cities', function (Blueprint $table) {
             $table->id();
             $table->string('name', 50);
-            $table->string('country')->nullable();
             $table->timestamp('created_at')->useCurrent();
         });
 
 
         Schema::create('frequencies', function (Blueprint $table) {
             $table->id();
-            $table->string('name', 50);
+            $table->string('name', 10);
             $table->unsignedInteger('interval_minutes');
             $table->timestamps();
         });

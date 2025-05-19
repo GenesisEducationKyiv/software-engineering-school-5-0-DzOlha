@@ -49,7 +49,8 @@ class WeatherRequest extends FormRequest
         throw new HttpResponseException(
             response()->json([
                 'success' => false,
-                'message' => $validator->errors()
+                'message' => 'Validation failed',
+                'errors' => $validator->errors()
             ], Response::HTTP_BAD_REQUEST)
         );
     }

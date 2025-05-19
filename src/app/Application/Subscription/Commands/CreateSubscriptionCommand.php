@@ -10,6 +10,7 @@ use App\Domain\Weather\ValueObjects\City;
 use App\Exceptions\Custom\CityNotFoundException;
 use App\Exceptions\Custom\EmailAlreadySubscribedException;
 use App\Exceptions\Custom\SubscriptionAlreadyPendingException;
+use App\Exceptions\ValidationException;
 
 class CreateSubscriptionCommand
 {
@@ -22,6 +23,7 @@ class CreateSubscriptionCommand
      * @throws SubscriptionAlreadyPendingException
      * @throws EmailAlreadySubscribedException
      * @throws CityNotFoundException
+     * @throws ValidationException
      */
     public function execute(CreateSubscriptionRequestDTO $dto): string
     {
