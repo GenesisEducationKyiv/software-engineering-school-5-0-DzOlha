@@ -15,5 +15,9 @@ interface WeatherRepositoryInterface
      * @throws CityNotFoundException|ApiAccessException
      */
     public function getCurrentWeather(City $city): WeatherData;
+
+    /**
+     * @throws ApiAccessException
+     */
     public function cityExists(City $city): bool;
 }

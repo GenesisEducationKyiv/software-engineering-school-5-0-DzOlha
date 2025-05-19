@@ -68,6 +68,15 @@ paths:
               example:
                 success: false
                 message: "City not found"
+        '502':
+          description: Weather API access error (bad gateway)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: "Access Weather API error"
 
   /api/subscribe:
     post:
@@ -202,6 +211,15 @@ paths:
               example:
                 success: false
                 message: "Subscription already exists"
+        '502':
+          description: Weather API access error (bad gateway)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: "Access Weather API error"
 
   /api/confirm/{token}:
     get:

@@ -14,6 +14,7 @@ use App\Domain\Subscription\ValueObjects\Frequency;
 use App\Domain\Subscription\ValueObjects\Token;
 use App\Domain\Weather\Repositories\WeatherRepositoryInterface;
 use App\Domain\Weather\ValueObjects\City;
+use App\Exceptions\Custom\ApiAccessException;
 use App\Exceptions\Custom\CityNotFoundException;
 use App\Exceptions\Custom\EmailAlreadySubscribedException;
 use App\Exceptions\Custom\SubscriptionAlreadyPendingException;
@@ -31,6 +32,7 @@ class SubscriptionService
      * @throws CityNotFoundException
      * @throws EmailAlreadySubscribedException
      * @throws SubscriptionAlreadyPendingException
+     * @throws ApiAccessException
      */
     public function subscribe(Email $email, City $city, Frequency $frequency): Subscription
     {

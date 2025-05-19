@@ -7,6 +7,7 @@ use App\Domain\Subscription\Services\SubscriptionService;
 use App\Domain\Subscription\ValueObjects\Email;
 use App\Domain\Subscription\ValueObjects\Frequency;
 use App\Domain\Weather\ValueObjects\City;
+use App\Exceptions\Custom\ApiAccessException;
 use App\Exceptions\Custom\CityNotFoundException;
 use App\Exceptions\Custom\EmailAlreadySubscribedException;
 use App\Exceptions\Custom\SubscriptionAlreadyPendingException;
@@ -24,6 +25,7 @@ class CreateSubscriptionCommand
      * @throws EmailAlreadySubscribedException
      * @throws CityNotFoundException
      * @throws ValidationException
+     * @throws ApiAccessException
      */
     public function execute(CreateSubscriptionRequestDTO $dto): string
     {

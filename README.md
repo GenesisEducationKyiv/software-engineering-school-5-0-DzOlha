@@ -101,12 +101,14 @@ OpenAPI documentation for the implemented API is available in the `openapi.yaml`
 ### API Design Considerations
 
 * **City Validation**: The system checks if a city exists before subscribing a user to ensure data integrity.
-* **Error Handling**: For validation errors, HTTP 400 codes are used (rather than 422) to maintain consistency with the original API specification provided in the task description. However, more detailed error messages are provided to facilitate debugging and improve user experience.
+* **Error Handling**:
+   * For validation errors, HTTP 400 codes are used (rather than 422) to maintain consistency with the original API specification provided in the task description.
+   * HTTP 502 Bad Gateway codes are implemented when WeatherAPI access fails during weather retrieval or subscription processes.
+   * Throughout the API, detailed error messages are provided to facilitate debugging and improve user experience.
 * **Token Management**: Confirmation token and cancellation token are designed to be different. 
-  * Confirmation token expire within 24 hours, cancellation token do not have expiration time. When a user requests the same subscription again (same combination of email, city, AND frequency):
+  * Confirmation token expire within 24 hours, cancellation token do not have expiration time. When a user requests the same subscription again (same combination of email, city, and frequency):
   * If the previous confirmation token hasn't expired: No new subscription record is created; the user is informed they need to check their email inbox for the confirmation link. 
   * If the previous confirmation token has expired: The system updates the confirmation token rather than creating a new subscription record.
-
 
 ## Testing the Application
 

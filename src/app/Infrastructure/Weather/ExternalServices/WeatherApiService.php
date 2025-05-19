@@ -59,6 +59,9 @@ class WeatherApiService implements WeatherRepositoryInterface
         }
     }
 
+    /**
+     * @throws ApiAccessException
+     */
     public function cityExists(City $city): bool
     {
         try {
