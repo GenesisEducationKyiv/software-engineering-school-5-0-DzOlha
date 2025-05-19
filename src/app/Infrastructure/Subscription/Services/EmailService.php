@@ -11,15 +11,15 @@ use Illuminate\Support\Facades\URL;
 
 class EmailService
 {
-    private string $confirmEndpoint = "/api/confirm";
-    private string $unsubscribeEndpoint = "/api/unsubscribe";
+    private string $confirmWebEndpoint = "/confirm";
+    private string $unsubscribeWebEndpoint = "/unsubscribe";
 
     public function sendConfirmationEmail(Subscription $subscription): void
     {
         $email = $subscription->getEmail()->getValue();
         $token = $subscription->getConfirmationToken()->getValue();
 
-        $confirmUrl = URL::to("{$this->confirmEndpoint}/{$token}");
+        $confirmUrl = URL::to("{$this->confirmWebEndpoint}?token={$token}");
 
         Mail::to($email)->send(new class($confirmUrl, $subscription) extends Mailable {
             public function __construct(
@@ -48,7 +48,7 @@ class EmailService
         $frequency = $subscription->getFrequency()->getName();
         $unsubscribeToken = $subscription->getUnsubscribeToken()->getValue();
 
-        $unsubscribeUrl = URL::to("{$this->unsubscribeEndpoint}/{$unsubscribeToken}");
+        $unsubscribeUrl = URL::to("{$this->unsubscribeWebEndpoint}?token={$unsubscribeToken}");
 
         Mail::to($email)->send(new class($city, $frequency, $weatherData, $unsubscribeUrl) extends Mailable {
             public function __construct(

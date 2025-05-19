@@ -10,7 +10,6 @@ use App\Exceptions\Custom\CityNotFoundException;
 use App\Exceptions\ValidationException;
 use App\Interfaces\Api\Requests\WeatherRequest;
 use Illuminate\Http\JsonResponse;
-use App\Http\Controllers\Controller;
 
 class WeatherController extends Controller
 {

@@ -16,7 +16,6 @@ use App\Exceptions\Custom\TokenNotFoundException;
 use App\Exceptions\ValidationException;
 use App\Interfaces\Api\Requests\SubscribeRequest;
 use Illuminate\Http\JsonResponse;
-use App\Http\Controllers\Controller;
 
 class SubscriptionController extends Controller
 {
