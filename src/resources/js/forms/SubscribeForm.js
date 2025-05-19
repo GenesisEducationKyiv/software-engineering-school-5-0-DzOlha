@@ -68,11 +68,11 @@ class SubscribeForm extends Form
                     errorMessages.push(...err.validationErrors[field]);
                 }
                 this.getForm.messageBlock.show(
-                    `Validation errors: ${errorMessages.join(', ')}`
+                    `${errorMessages.join(', ')}`
                 );
             } else {
                 this.getForm.messageBlock.show(
-                    `Subscription Error: ${err.message || JSON.stringify(err)}`
+                    `${err.message || JSON.stringify(err)}`
                 );
             }
         }

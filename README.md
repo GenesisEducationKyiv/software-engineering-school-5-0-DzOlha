@@ -74,13 +74,13 @@ All media files can be found in the `/media` folder located in the root director
    WEATHER_API_KEY=weather_api_key_is_here
    ```
 
-3. **Run the application in production-like mode** (no bind mounts for real-time code updates):
+3. **Run the application in production-like mode** (no bind mounts for real-time code updates, so working faster):
    ```bash
    cd infra/prod
    docker compose up --build
    ```
 
-4. Open your browser and go to: [http://localhost:8088](http://localhost:8088)
+4. Open your browser and go to: [http://localhost](http://localhost)
 
 5. You will se the following page:
 ---
@@ -139,4 +139,4 @@ The application uses Mailpit for email testing:
 To use the Weather API functionality:
 1. Create an account at [WeatherAPI](https://www.weatherapi.com/my)
 2. Obtain your API token
-3. Add the token to the appropriate `.env` files as described at the beginning of this README
+3. Add the token to the appropriate `/infra/dev/php/.env` and `/infra/prod/php/.env`files as described at the beginning of this README

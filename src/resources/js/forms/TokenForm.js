@@ -27,11 +27,11 @@ class TokenForm
                     errorMessages.push(...err.validationErrors[field]);
                 }
                 this.messageBlock.show(
-                    `Validation errors: ${errorMessages.join(', ')}`, true, 0
+                    `${errorMessages.join(', ')}`, true, 0
                 );
             } else {
                 this.messageBlock.show(
-                    `Subscription Error: ${err.message || JSON.stringify(err)}`, true, 0
+                    `${err.message || JSON.stringify(err)}`, true, 0
                 );
             }
         }
