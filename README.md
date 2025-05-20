@@ -19,7 +19,7 @@ All media files can be found in the `/media` folder located in the root director
       cp infra/dev/postgres/.env.example infra/dev/postgres/.env
       ```
 
-2. **(Optional) Customize database settings**:
+2. **Customize database settings(optional) and API key**:
 
    In `infra/dev/postgres/.env`:
    ```env
@@ -56,7 +56,7 @@ All media files can be found in the `/media` folder located in the root director
       cp infra/prod/postgres/.env.example infra/prod/postgres/.env
       ```
 
-2. **(Optional) Customize database settings**:
+2. **Customize database settings(optional) and API key**:
 
    In `infra/prod/postgres/.env`:
    ```env
@@ -74,7 +74,7 @@ All media files can be found in the `/media` folder located in the root director
    WEATHER_API_KEY=weather_api_key_is_here
    ```
 
-3. **Run the application in production-like mode** (no bind mounts for real-time code updates, so working faster):
+3. **Run the application in production-like mode** (no bind mounts for real-time code updates, so **working faster**):
    ```bash
    cd infra/prod
    docker compose up --build
@@ -82,7 +82,6 @@ All media files can be found in the `/media` folder located in the root director
 
 4. Open your browser and go to: [http://localhost](http://localhost)
 
-5. You will se the following page:
 ---
 
 ## ✅ Prerequisites
@@ -106,9 +105,9 @@ OpenAPI documentation for the implemented API is available in the `openapi.yaml`
    * HTTP 502 Bad Gateway codes are implemented when WeatherAPI access fails during weather retrieval or subscription processes.
    * Throughout the API, detailed error messages are provided to facilitate debugging and improve user experience.
 * **Token Management**: Confirmation token and cancellation token are designed to be different. 
-  * Confirmation token expire within 24 hours, cancellation token do not have expiration time. When a user requests the same subscription again (same combination of email, city, and frequency):
-  * If the previous confirmation token hasn't expired: No new subscription record is created; the user is informed they need to check their email inbox for the confirmation link. 
-  * If the previous confirmation token has expired: The system updates the confirmation token rather than creating a new subscription record.
+  * Confirmation token expire within 24 hours, cancellation token does not have expiration time. When a user requests the same subscription again (same combination of email, city, and frequency):
+    * If the previous confirmation token hasn't expired: No new subscription record is created; the user is informed they need to check their email inbox for the confirmation link. 
+    * If the previous confirmation token has expired: The system updates the confirmation token rather than creating a new subscription record.
 
 ## Testing the Application
 
