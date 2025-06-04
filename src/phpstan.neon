@@ -2,7 +2,6 @@ includes:
   - vendor/larastan/larastan/extension.neon
   - vendor/phpstan/phpstan/conf/bleedingEdge.neon
   - vendor/phpstan/phpstan-deprecation-rules/rules.neon
-  - vendor/phpstan/extension-installer/bootstrap.neon
 
 parameters:
   level: max
@@ -15,15 +14,13 @@ parameters:
     - tests
     - resources/views
 
-  excludes_analyse:
+  excludePaths:
     - bootstrap/*
     - storage/*
     - vendor/*
     - public/*
 
   # Enhanced type checking
-  checkMissingIterableValueType: true
-  checkGenericClassInNonGenericObjectType: true
   inferPrivatePropertyTypeFromConstructor: true
   checkTooWideReturnTypesInProtectedAndPublicMethods: true
   checkUninitializedProperties: true
@@ -66,9 +63,6 @@ parameters:
 
   # PHP version to target (update to match your environment)
   phpVersion: 80200  # for PHP 8.2
-
-  # Memory limit for large projects
-  memoryLimitFile: /tmp/phpstan/memory_limit
 
   # Parallel processing for better performance
   parallel:
