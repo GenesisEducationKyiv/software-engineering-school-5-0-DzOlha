@@ -8,5 +8,6 @@ class WeatherRequestDTO
 {
     public function __construct(
         public readonly City $city
-    ){}
+    ) {
+    }
 }

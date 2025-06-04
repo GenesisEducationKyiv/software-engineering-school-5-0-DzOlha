@@ -22,10 +22,11 @@ use Illuminate\Http\JsonResponse;
 class SubscriptionController extends Controller
 {
     public function __construct(
-        private readonly CreateSubscriptionCommand  $createSubscriptionCommand,
+        private readonly CreateSubscriptionCommand $createSubscriptionCommand,
         private readonly ConfirmSubscriptionCommand $confirmSubscriptionCommand,
-        private readonly UnsubscribeCommand         $unsubscribeCommand
-    ){}
+        private readonly UnsubscribeCommand $unsubscribeCommand
+    ) {
+    }
 
     /**
      * POST /subscribe
@@ -70,7 +71,7 @@ class SubscriptionController extends Controller
                 Token::confirmation($token)
             );
             $this->confirmSubscriptionCommand->execute($dto);
-        } catch (ValidationException|TokenNotFoundException $e) {
+        } catch (ValidationException | TokenNotFoundException $e) {
             return $this->errorResponse($e);
         }
 
@@ -92,7 +93,7 @@ class SubscriptionController extends Controller
             );
 
             $this->unsubscribeCommand->execute($dto);
-        } catch (ValidationException|TokenNotFoundException $e) {
+        } catch (ValidationException | TokenNotFoundException $e) {
             return $this->errorResponse($e);
         }
 

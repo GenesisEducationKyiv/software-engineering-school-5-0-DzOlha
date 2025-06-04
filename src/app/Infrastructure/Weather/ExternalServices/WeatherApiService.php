@@ -49,7 +49,7 @@ class WeatherApiService implements WeatherRepositoryInterface
                 );
             } else {
                 $data = $response->json();
-                if($data['error']['code'] === $this->cityNotFoundCode) {
+                if ($data['error']['code'] === $this->cityNotFoundCode) {
                     throw new CityNotFoundException();
                 }
                 throw new ApiAccessException();
@@ -71,10 +71,10 @@ class WeatherApiService implements WeatherRepositoryInterface
             ]);
 
             if ($response->successful()) {
-               return true;
+                return true;
             } else {
                 $data = $response->json();
-                if($data['error']['code'] === $this->cityNotFoundCode) {
+                if ($data['error']['code'] === $this->cityNotFoundCode) {
                     return false;
                 }
                 throw new ApiAccessException();

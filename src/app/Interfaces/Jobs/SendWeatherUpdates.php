@@ -17,18 +17,21 @@ use Illuminate\Support\Facades\Log;
 
 class SendWeatherUpdates implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable;
+    use InteractsWithQueue;
+    use Queueable;
+    use SerializesModels;
 
     public function __construct(
         private int $subscriptionId
-    ) {}
+    ) {
+    }
 
     public function handle(
         WeatherService $weatherService,
         EmailService $emailService,
         SubscriptionRepositoryInterface $subscriptionRepository
-    ): void
-    {
+    ): void {
         Log::info('Running weather update job', ['subscription_id' => $this->subscriptionId]);
         /**
          * @var Subscription $subscription
@@ -61,9 +64,7 @@ class SendWeatherUpdates implements ShouldQueue
              * Schedule the next update
              */
             self::dispatch($subscription->getId())->delay(now()->addMinutes($intervalMinutes));
-
-        }
-        catch (\Throwable $e) {
+        } catch (\Throwable $e) {
             Log::error('Failed to send weather update', [
                 'subscription_id' => $subscription->getId(),
                 'error' => $e->getMessage(),

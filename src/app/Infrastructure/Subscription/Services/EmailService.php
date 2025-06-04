@@ -21,7 +21,7 @@ class EmailService
 
         $confirmUrl = URL::to("{$this->confirmWebEndpoint}?token={$token}");
 
-        Mail::to($email)->send(new class($confirmUrl, $subscription) extends Mailable {
+        Mail::to($email)->send(new class ($confirmUrl, $subscription) extends Mailable {
             public function __construct(
                 private readonly string $confirmUrl,
                 private readonly Subscription $subscription
@@ -50,7 +50,7 @@ class EmailService
 
         $unsubscribeUrl = URL::to("{$this->unsubscribeWebEndpoint}?token={$unsubscribeToken}");
 
-        Mail::to($email)->send(new class($city, $frequency, $weatherData, $unsubscribeUrl) extends Mailable {
+        Mail::to($email)->send(new class ($city, $frequency, $weatherData, $unsubscribeUrl) extends Mailable {
             public function __construct(
                 private readonly string $city,
                 private readonly string $frequency,

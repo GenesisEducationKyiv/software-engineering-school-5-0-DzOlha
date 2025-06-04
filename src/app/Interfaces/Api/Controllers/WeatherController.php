@@ -26,8 +26,7 @@ class WeatherController extends Controller
             );
 
             $weatherData = $this->getCurrentWeatherQuery->execute($dto);
-        }
-        catch (ValidationException|CityNotFoundException|ApiAccessException $e) {
+        } catch (ValidationException | CityNotFoundException | ApiAccessException $e) {
             return $this->errorResponse($e);
         }
 

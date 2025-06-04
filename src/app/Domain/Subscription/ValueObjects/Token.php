@@ -88,7 +88,7 @@ class Token
     public static function createConfirmation(): self
     {
         return new self(
-            bin2hex(random_bytes(self::TOKEN_LENGTH/2)),
+            bin2hex(random_bytes(self::TOKEN_LENGTH / 2)),
             self::CONFIRM_TYPE,
             new \DateTimeImmutable(self::EXPIRATION_TIME_CONFIRM)
         );
@@ -101,7 +101,7 @@ class Token
     public static function createUnsubscribe(): self
     {
         return new self(
-            bin2hex(random_bytes(self::TOKEN_LENGTH/2)),
+            bin2hex(random_bytes(self::TOKEN_LENGTH / 2)),
             self::CANCEL_TYPE
         );
     }

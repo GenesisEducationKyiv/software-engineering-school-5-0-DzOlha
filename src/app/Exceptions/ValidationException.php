@@ -24,4 +24,3 @@ class ValidationException extends Exception
         return $this->code;
     }
 }
-

@@ -28,7 +28,7 @@ class SubscribeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => ['required', 'email:rfc,dns', 'min:5', 'max:254'], // Updated min to 5 (a@b.c) and max to 254 per RFC
+            'email' => ['required', 'email:rfc,dns', 'min:5', 'max:254'],
             'city' => ['required', 'string', 'min:2', 'max:50'],
             'frequency' => ['required', Rule::in(['daily', 'hourly'])],
         ];

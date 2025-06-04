@@ -127,11 +127,11 @@ class SubscriptionRepository implements SubscriptionRepositoryInterface
     }
 
     private function saveToken(
-        int                 $subscriptionId,
-        string              $token,
-        string              $type,
-        ?\DateTimeInterface $expiresAt = null): void
-    {
+        int $subscriptionId,
+        string $token,
+        string $type,
+        ?\DateTimeInterface $expiresAt = null
+    ): void {
         SubscriptionToken::create([
             'subscription_id' => $subscriptionId,
             'token'           => $token,
@@ -180,9 +180,10 @@ class SubscriptionRepository implements SubscriptionRepositoryInterface
     }
 
     public function replaceTokensForPending(
-        int $subscriptionId, TokenValueObject $confirm, TokenValueObject $cancel
-    ): void
-    {
+        int $subscriptionId,
+        TokenValueObject $confirm,
+        TokenValueObject $cancel
+    ): void {
         SubscriptionToken::query()
             ->where('subscription_id', $subscriptionId)
             ->delete();

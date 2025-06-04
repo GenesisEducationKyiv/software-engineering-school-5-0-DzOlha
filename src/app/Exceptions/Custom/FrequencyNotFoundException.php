@@ -10,7 +10,8 @@ class FrequencyNotFoundException extends CustomException
     public function __construct()
     {
         parent::__construct(
-            'Frequency with such name not found', Response::HTTP_NOT_FOUND
+            'Frequency with such name not found',
+            Response::HTTP_NOT_FOUND
         );
     }
 }

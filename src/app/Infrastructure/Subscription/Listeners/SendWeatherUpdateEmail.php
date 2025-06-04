@@ -9,7 +9,9 @@ use Illuminate\Support\Facades\Log;
 
 class SendWeatherUpdateEmail implements ShouldQueue
 {
-    public function __construct() {}
+    public function __construct()
+    {
+    }
 
     public function handle(SubscriptionConfirmed $event): void
     {
