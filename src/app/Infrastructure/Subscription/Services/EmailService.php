@@ -20,7 +20,9 @@ class EmailService
         $token = $subscription->getConfirmationToken()?->getValue();
 
         if (!$token) {
-            Log::info('Sending confirmation email to: ' . $subscription->getEmail() . " was FAILED due to absent confirmation token");
+            Log::info('Sending confirmation email to: '
+                                . $subscription->getEmail()
+                                . " was FAILED due to absent confirmation token");
             return;
         }
 
@@ -55,7 +57,9 @@ class EmailService
         $unsubscribeToken = $subscription->getUnsubscribeToken()?->getValue();
 
         if (!$unsubscribeToken) {
-            Log::info('Sending weather updates letter to: ' . $subscription->getEmail() . " was FAILED due to absent unsubscribe token");
+            Log::info('Sending weather updates letter to: '
+                                . $subscription->getEmail()
+                                . " was FAILED due to absent unsubscribe token");
             return;
         }
 
