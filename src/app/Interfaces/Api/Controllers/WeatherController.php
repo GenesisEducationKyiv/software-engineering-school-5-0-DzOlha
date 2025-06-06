@@ -20,19 +20,20 @@ class WeatherController extends Controller
 
     public function getCurrentWeather(WeatherRequest $request): JsonResponse
     {
+        $data = $request->validatedTyped();
+
         try {
             $dto = new WeatherRequestDTO(
-                new City($request->city)
+                new City($data['city'])
             );
 
             $weatherData = $this->getCurrentWeatherQuery->execute($dto);
-        }
-        catch (ValidationException|CityNotFoundException|ApiAccessException $e) {
+        } catch (ValidationException | CityNotFoundException | ApiAccessException $e) {
             return $this->errorResponse($e);
         }
 
         return $this->successResponse(
-            "Current weather for {$request->city}",
+            "Current weather for {$data['city']}",
             $weatherData->toArray()
         );
     }

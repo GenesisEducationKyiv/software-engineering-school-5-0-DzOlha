@@ -27,7 +27,7 @@ class Frequency
     {
         $name = trim($name);
 
-        if(!in_array($name, [self::DAILY, self::HOURLY])) {
+        if (!in_array($name, [self::DAILY, self::HOURLY])) {
             throw new ValidationException([
                 'name' => ["Invalid frequency name: {$name}"]
             ]);

@@ -26,7 +26,7 @@ class Status
     {
         $status = trim($status);
 
-        if(!in_array($status, [self::ACTIVE, self::CANCELED, self::PENDING])) {
+        if (!in_array($status, [self::ACTIVE, self::CANCELED, self::PENDING])) {
             throw new ValidationException([
                 'status' => ["Invalid status: {$status}"]
             ]);

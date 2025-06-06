@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Domain\Weather\ValueObjects;
 
 use App\Exceptions\ValidationException;
@@ -18,12 +19,12 @@ class City
     /**
      * @throws ValidationException
      */
-    public function validateCityName($name): void
+    public function validateCityName(string $name): void
     {
         $name = htmlspecialchars(trim($name));
         $len = strlen($name);
 
-        if($len < 2 || $len > 50) {
+        if ($len < 2 || $len > 50) {
             throw new ValidationException([
                 'city' => ["City name must be between 2 and 50 characters."]
             ]);
@@ -40,6 +41,9 @@ class City
         return $this->id;
     }
 
+    /**
+     * @return array{id: int|null, name: string}
+     */
     public function toArray(): array
     {
         return [

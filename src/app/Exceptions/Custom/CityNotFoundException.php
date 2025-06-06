@@ -7,9 +7,11 @@ use Symfony\Component\HttpFoundation\Response;
 
 class CityNotFoundException extends CustomException
 {
-    public function __construct(){
+    public function __construct()
+    {
         parent::__construct(
-            'City not found', Response::HTTP_NOT_FOUND
+            'City not found',
+            Response::HTTP_NOT_FOUND
         );
     }
 }

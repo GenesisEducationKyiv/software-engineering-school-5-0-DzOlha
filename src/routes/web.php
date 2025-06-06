@@ -19,4 +19,3 @@ Route::get('/unsubscribe', function () {
 Route::fallback(function () {
     return response()->view('pages.404', [], 404);
 });
-

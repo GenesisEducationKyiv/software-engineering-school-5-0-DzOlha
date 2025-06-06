@@ -17,21 +17,24 @@ use Illuminate\Support\Facades\Log;
 
 class SendWeatherUpdates implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable;
+    use InteractsWithQueue;
+    use Queueable;
+    use SerializesModels;
 
     public function __construct(
         private int $subscriptionId
-    ) {}
+    ) {
+    }
 
     public function handle(
         WeatherService $weatherService,
         EmailService $emailService,
         SubscriptionRepositoryInterface $subscriptionRepository
-    ): void
-    {
+    ): void {
         Log::info('Running weather update job', ['subscription_id' => $this->subscriptionId]);
         /**
-         * @var Subscription $subscription
+         * @var ?Subscription $subscription
          */
         $subscription = $subscriptionRepository->findSubscriptionById($this->subscriptionId);
 
@@ -46,6 +49,12 @@ class SendWeatherUpdates implements ShouldQueue
             'subscription' => $subscription->toArray()
         ]);
 
+        $subscriptionId = $subscription->getId();
+        if ($subscriptionId === null) {
+            Log::warning('Subscription ID is null, skipping dispatch');
+            return;
+        }
+
         try {
             $weatherData = $weatherService->getCurrentWeather(
                 new WeatherRequestDTO($subscription->getCity())
@@ -55,15 +64,13 @@ class SendWeatherUpdates implements ShouldQueue
 
             $intervalMinutes = $subscription->getFrequency()->getIntervalMinutes();
 
-            $this->updateSubscriptionEmailStatus($subscription->getId(), 'success', $intervalMinutes);
+            $this->updateSubscriptionEmailStatus($subscriptionId, 'success', $intervalMinutes);
 
             /**
              * Schedule the next update
              */
-            self::dispatch($subscription->getId())->delay(now()->addMinutes($intervalMinutes));
-
-        }
-        catch (\Throwable $e) {
+            self::dispatch($subscriptionId)->delay(now()->addMinutes($intervalMinutes));
+        } catch (\Throwable $e) {
             Log::error('Failed to send weather update', [
                 'subscription_id' => $subscription->getId(),
                 'error' => $e->getMessage(),
@@ -73,12 +80,12 @@ class SendWeatherUpdates implements ShouldQueue
             /**
              * Update with error status and retry in 60 minutes
              */
-            $this->updateSubscriptionEmailStatus($subscription->getId(), 'error', 60);
+            $this->updateSubscriptionEmailStatus($subscriptionId, 'error', 60);
 
             /**
              * Retry
              */
-            self::dispatch($subscription->getId())->delay(now()->addMinutes(60));
+            self::dispatch($subscriptionId)->delay(now()->addMinutes(60));
         }
     }
 

@@ -17,20 +17,28 @@ class EmailService
     public function sendConfirmationEmail(Subscription $subscription): void
     {
         $email = $subscription->getEmail()->getValue();
-        $token = $subscription->getConfirmationToken()->getValue();
+        $token = $subscription->getConfirmationToken()?->getValue();
+
+        if (!$token) {
+            Log::info('Sending confirmation email to: '
+                                . $subscription->getEmail()
+                                . " was FAILED due to absent confirmation token");
+            return;
+        }
 
         $confirmUrl = URL::to("{$this->confirmWebEndpoint}?token={$token}");
 
-        Mail::to($email)->send(new class($confirmUrl, $subscription) extends Mailable {
+        Mail::to($email)->send(new class ($confirmUrl, $subscription) extends Mailable {
             public function __construct(
                 private readonly string $confirmUrl,
                 private readonly Subscription $subscription
             ) {
             }
 
-            public function build()
+            public function build(): Mailable
             {
                 Log::info('Sending confirmation email to: ' . $this->subscription->getEmail());
+
                 return $this->subject('Confirm your weather subscription')
                     ->view('emails.confirm-subscription')
                     ->with([
@@ -46,11 +54,18 @@ class EmailService
         $email = $subscription->getEmail()->getValue();
         $city = $subscription->getCity()->getName();
         $frequency = $subscription->getFrequency()->getName();
-        $unsubscribeToken = $subscription->getUnsubscribeToken()->getValue();
+        $unsubscribeToken = $subscription->getUnsubscribeToken()?->getValue();
+
+        if (!$unsubscribeToken) {
+            Log::info('Sending weather updates letter to: '
+                                . $subscription->getEmail()
+                                . " was FAILED due to absent unsubscribe token");
+            return;
+        }
 
         $unsubscribeUrl = URL::to("{$this->unsubscribeWebEndpoint}?token={$unsubscribeToken}");
 
-        Mail::to($email)->send(new class($city, $frequency, $weatherData, $unsubscribeUrl) extends Mailable {
+        Mail::to($email)->send(new class ($city, $frequency, $weatherData, $unsubscribeUrl) extends Mailable {
             public function __construct(
                 private readonly string $city,
                 private readonly string $frequency,
@@ -59,7 +74,7 @@ class EmailService
             ) {
             }
 
-            public function build()
+            public function build(): Mailable
             {
                 Log::info('Sending weather update');
 

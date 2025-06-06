@@ -7,9 +7,11 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ApiAccessException extends CustomException
 {
-    public function __construct(){
+    public function __construct()
+    {
         parent::__construct(
-            'Access Weather API error', Response::HTTP_BAD_GATEWAY
+            'Access Weather API error',
+            Response::HTTP_BAD_GATEWAY
         );
     }
 }
