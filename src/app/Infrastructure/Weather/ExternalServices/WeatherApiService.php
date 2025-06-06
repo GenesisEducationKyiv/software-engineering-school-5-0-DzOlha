@@ -20,15 +20,18 @@ class WeatherApiService implements WeatherRepositoryInterface
 
     public function __construct()
     {
-        $this->apiKey = config('services.weather.api_key');
-        $this->apiUrl = config('services.weather.api_url');
+        $key = config('services.weather.api_key');
+        $url = config('services.weather.api_url');
+
+        $this->apiKey = is_string($key) ? $key : "";
+        $this->apiUrl = is_string($url) ? $url : "";
     }
 
     /**
      * Get current weather for a city
      *
-     * @param string $city
-     * @return array
+     * @param City $city
+     * @return WeatherData
      * @throws CityNotFoundException|ApiAccessException
      */
     public function getCurrentWeather(City $city): WeatherData
@@ -40,6 +43,9 @@ class WeatherApiService implements WeatherRepositoryInterface
             ]);
 
             if ($response->successful()) {
+                /**
+                 * @var array{current:array{temp_c: float, humidity: float, condition: array{text: string}}} $data
+                 */
                 $data = $response->json();
 
                 return new WeatherData(
@@ -48,6 +54,9 @@ class WeatherApiService implements WeatherRepositoryInterface
                     description: $data['current']['condition']['text'],
                 );
             } else {
+                /**
+                 * @var array{error:array{code: int}} $data
+                 */
                 $data = $response->json();
                 if ($data['error']['code'] === $this->cityNotFoundCode) {
                     throw new CityNotFoundException();
@@ -73,7 +82,11 @@ class WeatherApiService implements WeatherRepositoryInterface
             if ($response->successful()) {
                 return true;
             } else {
+                /**
+                 * @var array{error:array{code: int}} $data
+                 */
                 $data = $response->json();
+
                 if ($data['error']['code'] === $this->cityNotFoundCode) {
                     return false;
                 }

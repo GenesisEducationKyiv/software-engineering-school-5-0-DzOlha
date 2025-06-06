@@ -17,7 +17,7 @@ class WeatherService
     }
 
     /**
-     * @param City $city
+     * @param WeatherRequestDTO $dto
      * @return WeatherData
      * @throws CityNotFoundException|ApiAccessException
      */

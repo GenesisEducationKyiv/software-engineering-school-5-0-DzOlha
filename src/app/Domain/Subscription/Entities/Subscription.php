@@ -103,6 +103,18 @@ class Subscription
     {
         return $this->status->isCanceled();
     }
+
+    /**
+     * @return array{
+     *     id: int|null,
+     *     email: string,
+     *     city: array{name: string},
+     *     frequency: array{id: int|null, name: string, interval_minutes: int},
+     *     status: string,
+     *     confirmation_token: string|null,
+     *     unsubscribe_token: string|null
+     * }
+     */
     public function toArray(): array
     {
         return [

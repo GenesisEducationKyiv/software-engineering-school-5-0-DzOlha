@@ -19,7 +19,7 @@ class City
     /**
      * @throws ValidationException
      */
-    public function validateCityName($name): void
+    public function validateCityName(string $name): void
     {
         $name = htmlspecialchars(trim($name));
         $len = strlen($name);
@@ -41,6 +41,9 @@ class City
         return $this->id;
     }
 
+    /**
+     * @return array{id: int|null, name: string}
+     */
     public function toArray(): array
     {
         return [

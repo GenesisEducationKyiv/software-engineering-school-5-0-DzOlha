@@ -35,10 +35,12 @@ class SubscriptionController extends Controller
      */
     public function subscribe(SubscribeRequest $request): JsonResponse
     {
+        $data = $request->validatedTyped();
+
         $dto = new CreateSubscriptionRequestDTO(
-            $request->email,
-            $request->city,
-            $request->frequency
+            $data['email'],
+            $data['city'],
+            $data['frequency']
         );
 
         try {

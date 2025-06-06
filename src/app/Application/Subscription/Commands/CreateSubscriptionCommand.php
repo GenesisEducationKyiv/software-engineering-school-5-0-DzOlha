@@ -29,7 +29,7 @@ class CreateSubscriptionCommand
      * @throws ApiAccessException
      * @throws FrequencyNotFoundException
      */
-    public function execute(CreateSubscriptionRequestDTO $dto): string
+    public function execute(CreateSubscriptionRequestDTO $dto): ?string
     {
         $subscription = $this->subscriptionService->subscribe(
             new Email($dto->email),
@@ -37,6 +37,6 @@ class CreateSubscriptionCommand
             Frequency::fromName($dto->frequency)
         );
 
-        return $subscription->getConfirmationToken()->getValue();
+        return $subscription->getConfirmationToken()?->getValue();
     }
 }

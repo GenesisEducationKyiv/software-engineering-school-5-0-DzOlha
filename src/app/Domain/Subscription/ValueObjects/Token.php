@@ -30,7 +30,7 @@ class Token
     /**
      * @throws ValidationException
      */
-    private function validateType($type): void
+    private function validateType(string $type): void
     {
         $type = trim($type);
 

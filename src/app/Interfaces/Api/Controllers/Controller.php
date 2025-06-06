@@ -24,6 +24,12 @@ abstract class Controller
         }
     }
 
+    /**
+     * @param string $message
+     * @param array{}|array{temperature: float, humidity: float, description: string} $data
+     * @param int $code
+     * @return JsonResponse
+     */
     protected function successResponse(string $message, array $data = [], int $code = 200): JsonResponse
     {
         if ($data) {

@@ -15,6 +15,8 @@ use App\Infrastructure\Subscription\Models\Frequency;
 use App\Infrastructure\Subscription\Models\Subscription;
 use App\Infrastructure\Subscription\Models\SubscriptionToken;
 use App\Infrastructure\Subscription\Models\User;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 
 class SubscriptionRepository implements SubscriptionRepositoryInterface
@@ -73,26 +75,27 @@ class SubscriptionRepository implements SubscriptionRepositoryInterface
 
     public function findSubscriptionById(int $id): ?SubscriptionEntity
     {
+        /** @var Subscription|null $subscription */
         $subscription = Subscription::with([
             'user',
             'city',
             'frequency',
-            'tokens' => function ($query) {
+            'tokens' => function (HasMany $query) {
                 $query->whereIn('type', ['confirm', 'cancel'])
-                    ->where(function ($q) {
+                    ->where(function (Builder $q) {
                         $q->whereNull('expires_at')
                             ->orWhere('expires_at', '>', now());
                     });
             },
         ])->find($id);
 
-        if (!$subscription) {
+        if (!$subscription || !$subscription->user || !$subscription->city || !$subscription->frequency) {
             return null;
         }
 
         $subscriptionEntity = new SubscriptionEntity(
             new Email($subscription->user->email),
-            new CityValueObject($subscription->city->name, $subscription->city->country),
+            new CityValueObject($subscription->city->name),
             FrequencyValueObject::fromId(
                 $subscription->frequency->id,
                 $subscription->frequency->name,
@@ -104,14 +107,23 @@ class SubscriptionRepository implements SubscriptionRepositoryInterface
 
         $tokens = $subscription->tokens ?? collect();
 
+        /**
+         * @var ?SubscriptionToken $confirmToken
+         */
         $confirmToken = $tokens->firstWhere('type', 'confirm');
+
+        /**
+         * @var ?SubscriptionToken $cancelToken
+         */
         $cancelToken  = $tokens->firstWhere('type', 'cancel');
 
         if ($confirmToken) {
+            $expiresAt = $confirmToken->expires_at ? new \DateTimeImmutable($confirmToken->expires_at) : null;
+
             $subscriptionEntity->setConfirmationToken(new TokenValueObject(
                 $confirmToken->token,
                 $confirmToken->type,
-                new \DateTimeImmutable($confirmToken->expires_at)
+                $expiresAt
             ));
         }
 

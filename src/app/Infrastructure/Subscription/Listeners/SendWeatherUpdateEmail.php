@@ -15,7 +15,14 @@ class SendWeatherUpdateEmail implements ShouldQueue
 
     public function handle(SubscriptionConfirmed $event): void
     {
-        Log::info('SubscriptionConfirmed event received', ['subscription_id' => $event->subscription->getId()]);
-        SendWeatherUpdates::dispatch($event->subscription->getId());
+        $subscriptionId = $event->subscription->getId();
+
+        if ($subscriptionId === null) {
+            Log::error('Cannot dispatch SendWeatherUpdates: subscription has no ID');
+            return;
+        }
+
+        Log::info('SubscriptionConfirmed event received', ['subscription_id' => $subscriptionId]);
+        SendWeatherUpdates::dispatch($subscriptionId);
     }
 }
