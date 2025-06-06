@@ -1,4 +1,4 @@
-# 🌦️ WeatherNet Application
+# 🌦️ WeatherNet Application!
 
 A Docker-based web application for monitoring weather data.
 
