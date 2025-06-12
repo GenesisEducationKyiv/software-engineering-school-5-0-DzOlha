@@ -6,6 +6,9 @@ use App\Exceptions\ValidationException;
 
 class Email
 {
+    private const MIN_LENGTH = 5;
+    private const MAX_LENGTH = 254;
+
     public function __construct(
         private readonly string $value
     ) {
@@ -20,7 +23,11 @@ class Email
         $email = htmlspecialchars(trim($email));
 
         $len = strlen($email);
-        if ($len < 5 || $len > 254 || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        if (
+            $len < self::MIN_LENGTH ||
+            $len > self::MAX_LENGTH ||
+            !filter_var($email, FILTER_VALIDATE_EMAIL)
+        ) {
             throw new ValidationException([
                 'email' => ["Invalid email address: {$email}"]
             ]);

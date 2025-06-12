@@ -11,6 +11,11 @@ class Token
     private const CONFIRM_TYPE = 'confirm';
     private const CANCEL_TYPE = 'cancel';
 
+    private const TOKEN_TYPES = [
+        self::CONFIRM_TYPE,
+        self::CANCEL_TYPE
+    ];
+
     private const TOKEN_LENGTH = 64;
 
     private const EXPIRATION_TIME_CONFIRM = '+24 hours';
@@ -34,7 +39,7 @@ class Token
     {
         $type = trim($type);
 
-        if (!in_array($type, [self::CONFIRM_TYPE, self::CANCEL_TYPE])) {
+        if (!in_array($type, self::TOKEN_TYPES)) {
             throw new ValidationException([
                 'token' => ["Invalid token type: {$type}"]
             ]);

@@ -9,6 +9,11 @@ class Frequency
     private const DAILY = 'daily';
     private const HOURLY = 'hourly';
 
+    public const FREQUENCY_TYPES = [
+        self::DAILY,
+        self::HOURLY
+    ];
+
     /**
      * @throws ValidationException
      */
@@ -27,7 +32,7 @@ class Frequency
     {
         $name = trim($name);
 
-        if (!in_array($name, [self::DAILY, self::HOURLY])) {
+        if (!in_array($name, self::FREQUENCY_TYPES)) {
             throw new ValidationException([
                 'name' => ["Invalid frequency name: {$name}"]
             ]);

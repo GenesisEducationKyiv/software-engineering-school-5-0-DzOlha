@@ -6,6 +6,9 @@ use App\Exceptions\ValidationException;
 
 class City
 {
+    private const MIN_LENGTH = 2;
+    private const MAX_LENGTH = 50;
+
     /**
      * @throws ValidationException
      */
@@ -24,9 +27,13 @@ class City
         $name = htmlspecialchars(trim($name));
         $len = strlen($name);
 
-        if ($len < 2 || $len > 50) {
+        if ($len < self::MIN_LENGTH || $len > self::MAX_LENGTH) {
             throw new ValidationException([
-                'city' => ["City name must be between 2 and 50 characters."]
+                'city' => [
+                    'City name must be between '
+                    . self::MIN_LENGTH . ' and '
+                    . self::MAX_LENGTH . ' characters.'
+                ]
             ]);
         }
     }

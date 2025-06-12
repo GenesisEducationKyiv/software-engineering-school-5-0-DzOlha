@@ -89,7 +89,12 @@ class SubscriptionRepository implements SubscriptionRepositoryInterface
             },
         ])->find($id);
 
-        if (!$subscription || !$subscription->user || !$subscription->city || !$subscription->frequency) {
+        if (
+            !$subscription ||
+            !$subscription->user ||
+            !$subscription->city ||
+            !$subscription->frequency
+        ) {
             return null;
         }
 
@@ -115,7 +120,7 @@ class SubscriptionRepository implements SubscriptionRepositoryInterface
         /**
          * @var ?SubscriptionToken $cancelToken
          */
-        $cancelToken  = $tokens->firstWhere('type', 'cancel');
+        $cancelToken = $tokens->firstWhere('type', 'cancel');
 
         if ($confirmToken) {
             $expiresAt = $confirmToken->expires_at ? new \DateTimeImmutable($confirmToken->expires_at) : null;
