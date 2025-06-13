@@ -23,12 +23,12 @@ class SubscribeRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, mixed>
+     * @return array<string, array<int|string, string>|Rule[]>
      */
     public function rules(): array
     {
         return [
-            'email' => ['required', 'email:rfc,dns', 'min:5', 'max:254'], // Updated min to 5 (a@b.c) and max to 254 per RFC
+            'email' => ['required', 'email:rfc,dns', 'min:5', 'max:254'],
             'city' => ['required', 'string', 'min:2', 'max:50'],
             'frequency' => ['required', Rule::in(['daily', 'hourly'])],
         ];
@@ -37,7 +37,7 @@ class SubscribeRequest extends FormRequest
     /**
      * Custom error messages for validation rules.
      *
-     * @return array
+     * @return array<string, string>
      */
     public function messages(): array
     {
@@ -74,5 +74,17 @@ class SubscribeRequest extends FormRequest
                 'errors' => $validator->errors()
             ], Response::HTTP_BAD_REQUEST)
         );
+    }
+
+    /**
+     * Get validated data with strict types.
+     *
+     * @return array{email: string, city: string, frequency: string}
+     */
+    public function validatedTyped(): array
+    {
+        /** @var array{email: string, city: string, frequency: string} $data */
+        $data = $this->validated();
+        return $data;
     }
 }

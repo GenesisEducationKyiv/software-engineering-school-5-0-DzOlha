@@ -3,3 +3,4 @@
 /infra/prod/postgres/.env
 /infra/prod/php/.env
 .idea/
+/src/.phpcs-cache

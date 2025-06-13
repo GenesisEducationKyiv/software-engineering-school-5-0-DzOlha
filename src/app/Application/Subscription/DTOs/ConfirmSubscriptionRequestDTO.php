@@ -8,5 +8,6 @@ class ConfirmSubscriptionRequestDTO
 {
     public function __construct(
         public readonly Token $confirmationToken
-    ){}
+    ) {
+    }
 }

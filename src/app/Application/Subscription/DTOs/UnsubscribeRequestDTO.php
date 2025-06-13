@@ -8,5 +8,6 @@ class UnsubscribeRequestDTO
 {
     public function __construct(
         public readonly Token $cancelToken
-    ){}
+    ) {
+    }
 }

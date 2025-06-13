@@ -10,6 +10,12 @@ class Status
     public const ACTIVE = 'active';
     public const CANCELED = 'canceled';
 
+    public const SUBSCRIPTION_STATUSES = [
+        self::PENDING,
+        self::ACTIVE,
+        self::CANCELED
+    ];
+
     /**
      * @throws ValidationException
      */
@@ -26,7 +32,7 @@ class Status
     {
         $status = trim($status);
 
-        if(!in_array($status, [self::ACTIVE, self::CANCELED, self::PENDING])) {
+        if (!in_array($status, self::SUBSCRIPTION_STATUSES)) {
             throw new ValidationException([
                 'status' => ["Invalid status: {$status}"]
             ]);

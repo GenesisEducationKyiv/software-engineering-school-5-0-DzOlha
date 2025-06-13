@@ -11,6 +11,11 @@ class Token
     private const CONFIRM_TYPE = 'confirm';
     private const CANCEL_TYPE = 'cancel';
 
+    private const TOKEN_TYPES = [
+        self::CONFIRM_TYPE,
+        self::CANCEL_TYPE
+    ];
+
     private const TOKEN_LENGTH = 64;
 
     private const EXPIRATION_TIME_CONFIRM = '+24 hours';
@@ -30,11 +35,11 @@ class Token
     /**
      * @throws ValidationException
      */
-    private function validateType($type): void
+    private function validateType(string $type): void
     {
         $type = trim($type);
 
-        if (!in_array($type, [self::CONFIRM_TYPE, self::CANCEL_TYPE])) {
+        if (!in_array($type, self::TOKEN_TYPES)) {
             throw new ValidationException([
                 'token' => ["Invalid token type: {$type}"]
             ]);
@@ -88,7 +93,7 @@ class Token
     public static function createConfirmation(): self
     {
         return new self(
-            bin2hex(random_bytes(self::TOKEN_LENGTH/2)),
+            bin2hex(random_bytes(self::TOKEN_LENGTH / 2)),
             self::CONFIRM_TYPE,
             new \DateTimeImmutable(self::EXPIRATION_TIME_CONFIRM)
         );
@@ -101,7 +106,7 @@ class Token
     public static function createUnsubscribe(): self
     {
         return new self(
-            bin2hex(random_bytes(self::TOKEN_LENGTH/2)),
+            bin2hex(random_bytes(self::TOKEN_LENGTH / 2)),
             self::CANCEL_TYPE
         );
     }

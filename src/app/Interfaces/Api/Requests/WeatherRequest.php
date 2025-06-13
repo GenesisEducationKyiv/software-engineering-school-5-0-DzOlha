@@ -5,6 +5,7 @@ namespace App\Interfaces\Api\Requests;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Validation\Rule;
 use Symfony\Component\HttpFoundation\Response;
 
 class WeatherRequest extends FormRequest
@@ -14,6 +15,11 @@ class WeatherRequest extends FormRequest
         return true;
     }
 
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, array<int|string, string>|Rule[]>
+     */
     public function rules(): array
     {
         return [
@@ -24,7 +30,7 @@ class WeatherRequest extends FormRequest
     /**
      * Custom error messages for validation rules.
      *
-     * @return array
+     * @return array<string, string>
      */
     public function messages(): array
     {
@@ -53,5 +59,17 @@ class WeatherRequest extends FormRequest
                 'errors' => $validator->errors()
             ], Response::HTTP_BAD_REQUEST)
         );
+    }
+
+    /**
+     * Get validated data with strict types.
+     *
+     * @return array{city: string}
+     */
+    public function validatedTyped(): array
+    {
+        /** @var array{city: string} $data*/
+        $data = $this->validated();
+        return $data;
     }
 }

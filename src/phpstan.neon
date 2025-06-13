@@ -1,0 +1,71 @@
+includes:
+  - vendor/larastan/larastan/extension.neon
+  - vendor/phpstan/phpstan/conf/bleedingEdge.neon
+  - vendor/phpstan/phpstan-deprecation-rules/rules.neon
+
+parameters:
+  level: max
+
+  paths:
+    - app
+    - routes
+    - database
+    - config
+    - tests
+    - resources/views
+
+  excludePaths:
+    - bootstrap/*
+    - storage/*
+    - vendor/*
+    - public/*
+    - config/*
+
+  # Enhanced type checking
+  inferPrivatePropertyTypeFromConstructor: true
+  checkTooWideReturnTypesInProtectedAndPublicMethods: true
+  checkUninitializedProperties: true
+  checkOctaneCompatibility: true
+
+  # Error reporting
+  reportUnmatchedIgnoredErrors: false
+  reportMaybesInMethodSignatures: true
+  reportStaticMethodSignatures: true
+
+  ignoreErrors:
+    # Eloquent magic methods and properties
+    - '#Call to an undefined method Illuminate\\Database\\Eloquent\\(Builder|Collection)::.*#'
+    - '#Access to an undefined property Illuminate\\Database\\Eloquent\\Model::\$.*#'
+
+    # Laravel facade magic
+    - '#Call to an undefined static method Illuminate\\Support\\Facades\\.*#'
+
+    # Testing framework specifics
+    - '#Call to an undefined method Mockery\\MockInterface::(shouldReceive|allows|expects)#'
+    - '#Call to an undefined method PHPUnit\\Framework\\MockObject\\MockObject::.*#'
+
+    # Laravel helper functions (if not using ide-helper)
+    - '#Function (config|route|trans|__) not found#'
+
+    # Common Laravel patterns that are safe
+    - '#Unsafe usage of new static\(\) in context of .*Model#'
+    - '#Parameter \#1 \$callback of method Illuminate\\Support\\Collection::map\(\) expects callable.*#'
+
+  # Laravel support
+  scanFiles:
+    - bootstrap/app.php
+
+  # Additional scan directories for better analysis
+  scanDirectories:
+    - app
+
+  # Increase performance by caching results
+  tmpDir: /tmp/phpstan
+
+  # PHP version to target (update to match your environment)
+  phpVersion: 80200  # for PHP 8.2
+
+  # Parallel processing for better performance
+  parallel:
+    jobSize: 20
+    maximumNumberOfProcesses: 4

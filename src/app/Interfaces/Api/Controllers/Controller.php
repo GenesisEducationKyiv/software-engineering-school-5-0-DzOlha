@@ -10,14 +10,13 @@ abstract class Controller
 {
     protected function errorResponse(ValidationException | CustomException $e): JsonResponse
     {
-        if($e instanceof ValidationException) {
+        if ($e instanceof ValidationException) {
             return response()->json([
                 'success' => false,
                 'message' => $e->getMessage(),
                 'errors' => $e->getErrors()
             ], $e->getStatusCode());
-        }
-        else {
+        } else {
             return response()->json([
                 'success' => false,
                 'message' => $e->getMessage()
@@ -25,9 +24,15 @@ abstract class Controller
         }
     }
 
+    /**
+     * @param string $message
+     * @param array{}|array{temperature: float, humidity: float, description: string} $data
+     * @param int $code
+     * @return JsonResponse
+     */
     protected function successResponse(string $message, array $data = [], int $code = 200): JsonResponse
     {
-        if($data) {
+        if ($data) {
             return response()->json([
                 'success' => true,
                 'message' => $message,

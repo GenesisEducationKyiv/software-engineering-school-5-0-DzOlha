@@ -11,6 +11,9 @@ class WeatherResponseDTO
     ) {
     }
 
+    /**
+     * @return array{temperature: float, humidity: float, description: string}
+     */
     public function toArray(): array
     {
         return [

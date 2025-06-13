@@ -7,9 +7,11 @@ use Symfony\Component\HttpFoundation\Response;
 
 class TokenNotFoundException extends CustomException
 {
-    public function __construct(){
+    public function __construct()
+    {
         parent::__construct(
-            'Token not found', Response::HTTP_NOT_FOUND
+            'Token not found',
+            Response::HTTP_NOT_FOUND
         );
     }
 }
