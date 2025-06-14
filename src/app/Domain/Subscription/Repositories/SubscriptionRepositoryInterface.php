@@ -18,12 +18,24 @@ interface SubscriptionRepositoryInterface
     public function save(Subscription $subscriptionEntity): Subscription;
 
     public function hasActiveSubscription(Subscription $subscription): bool;
+
     public function findSubscriptionById(int $id): ?Subscription;
+
     public function getPendingSubscription(Subscription $subscription): ?SubscriptionModel;
+
     public function hasValidConfirmationToken(int $subscriptionId): bool;
+
     public function replaceTokensForPending(int $subscriptionId, Token $confirm, Token $cancel): void;
+
     public function delete(int $subscriptionId): bool;
+
     public function confirmSubscriptionByToken(string $token): ?Subscription;
+
     public function unsubscribeByToken(string $token): ?Subscription;
-    public function updateSubscriptionEmailStatus(int $subscriptionId, int $intervalMinutes, bool $success = true): bool;
+
+    public function updateSubscriptionEmailStatus(
+        int $subscriptionId,
+        int $intervalMinutes,
+        bool $success = true
+    ): bool;
 }
