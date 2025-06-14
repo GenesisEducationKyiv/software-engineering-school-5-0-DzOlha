@@ -3,10 +3,10 @@
 namespace App\Application\Subscription\Commands;
 
 use App\Application\Subscription\DTOs\CreateSubscriptionRequestDTO;
-use App\Domain\Subscription\Services\SubscriptionService;
-use App\Domain\Subscription\ValueObjects\Email;
-use App\Domain\Subscription\ValueObjects\Frequency;
-use App\Domain\Weather\ValueObjects\City;
+use App\Application\Subscription\Services\SubscriptionServiceInterface;
+use App\Domain\Subscription\ValueObjects\Email\Email;
+use App\Domain\Subscription\ValueObjects\Frequency\Frequency;
+use App\Domain\Weather\ValueObjects\City\City;
 use App\Exceptions\Custom\ApiAccessException;
 use App\Exceptions\Custom\CityNotFoundException;
 use App\Exceptions\Custom\EmailAlreadySubscribedException;
@@ -17,7 +17,7 @@ use App\Exceptions\ValidationException;
 class CreateSubscriptionCommand
 {
     public function __construct(
-        private readonly SubscriptionService $subscriptionService
+        private readonly SubscriptionServiceInterface $subscriptionService
     ) {
     }
 
