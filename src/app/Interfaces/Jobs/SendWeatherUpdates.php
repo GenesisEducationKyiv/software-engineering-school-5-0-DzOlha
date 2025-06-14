@@ -73,8 +73,7 @@ class SendWeatherUpdates implements ShouldQueue
              * Schedule the next update
              */
             self::dispatch($subscriptionId)->delay(now()->addMinutes($intervalMinutes));
-        }
-        else {
+        } else {
             Log::error('Failed to send weather update', [
                 'subscription_id' => $subscription->getId()
             ]);
