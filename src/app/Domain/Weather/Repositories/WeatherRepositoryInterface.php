@@ -2,7 +2,7 @@
 
 namespace App\Domain\Weather\Repositories;
 
-use App\Domain\Weather\ValueObjects\City;
+use App\Domain\Weather\ValueObjects\City\City;
 use App\Domain\Weather\ValueObjects\WeatherData;
 use App\Exceptions\Custom\ApiAccessException;
 use App\Exceptions\Custom\CityNotFoundException;
