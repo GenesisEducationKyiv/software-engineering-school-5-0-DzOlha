@@ -8,7 +8,7 @@ use App\Application\Subscription\Commands\UnsubscribeCommand;
 use App\Application\Subscription\DTOs\ConfirmSubscriptionRequestDTO;
 use App\Application\Subscription\DTOs\CreateSubscriptionRequestDTO;
 use App\Application\Subscription\DTOs\UnsubscribeRequestDTO;
-use App\Domain\Subscription\ValueObjects\Token;
+use App\Domain\Subscription\ValueObjects\Token\Token;
 use App\Exceptions\Custom\ApiAccessException;
 use App\Exceptions\Custom\CityNotFoundException;
 use App\Exceptions\Custom\EmailAlreadySubscribedException;

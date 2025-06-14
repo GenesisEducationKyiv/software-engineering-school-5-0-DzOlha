@@ -4,19 +4,21 @@ namespace App\Infrastructure\Subscription\Repositories;
 
 use App\Domain\Subscription\Entities\Subscription as SubscriptionEntity;
 use App\Domain\Subscription\Repositories\SubscriptionRepositoryInterface;
-use App\Domain\Subscription\ValueObjects\Email;
-use App\Domain\Subscription\ValueObjects\Frequency as FrequencyValueObject;
-use App\Domain\Subscription\ValueObjects\Status;
-use App\Domain\Subscription\ValueObjects\Token as TokenValueObject;
-use App\Domain\Weather\ValueObjects\City as CityValueObject;
+use App\Domain\Subscription\ValueObjects\Email\Email;
+use App\Domain\Subscription\ValueObjects\Frequency\Frequency as FrequencyValueObject;
+use App\Domain\Subscription\ValueObjects\Status\Status;
+use App\Domain\Subscription\ValueObjects\Token\Token as TokenValueObject;
+use App\Domain\Subscription\ValueObjects\Token\TokenType;
+use App\Domain\Weather\ValueObjects\City\City as CityValueObject;
 use App\Exceptions\Custom\FrequencyNotFoundException;
 use App\Infrastructure\Subscription\Models\City;
 use App\Infrastructure\Subscription\Models\Frequency;
 use App\Infrastructure\Subscription\Models\Subscription;
+use App\Infrastructure\Subscription\Models\SubscriptionEmail;
 use App\Infrastructure\Subscription\Models\SubscriptionToken;
 use App\Infrastructure\Subscription\Models\User;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\DB;
 
 class SubscriptionRepository implements SubscriptionRepositoryInterface
@@ -103,8 +105,7 @@ class SubscriptionRepository implements SubscriptionRepositoryInterface
             new CityValueObject($subscription->city->name),
             FrequencyValueObject::fromId(
                 $subscription->frequency->id,
-                $subscription->frequency->name,
-                $subscription->frequency->interval_minutes
+                $subscription->frequency->name
             ),
             Status::fromString($subscription->status)
         );
@@ -127,7 +128,7 @@ class SubscriptionRepository implements SubscriptionRepositoryInterface
 
             $subscriptionEntity->setConfirmationToken(new TokenValueObject(
                 $confirmToken->token,
-                $confirmToken->type,
+                TokenType::fromString($confirmToken->type),
                 $expiresAt
             ));
         }
@@ -135,7 +136,7 @@ class SubscriptionRepository implements SubscriptionRepositoryInterface
         if ($cancelToken) {
             $subscriptionEntity->setUnsubscribeToken(new TokenValueObject(
                 $cancelToken->token,
-                $cancelToken->type,
+                TokenType::fromString($cancelToken->type),
                 null
             ));
         }
@@ -281,5 +282,29 @@ class SubscriptionRepository implements SubscriptionRepositoryInterface
 
             return $subscriptionEntity;
         });
+    }
+
+    public function updateSubscriptionEmailStatus(
+        int $subscriptionId,
+        int $intervalMinutes,
+        bool $success = true
+    ): bool {
+        $status = $success ? 'success' : 'error';
+
+        $now = now();
+        $nextScheduled = $now->copy()->addMinutes($intervalMinutes);
+
+        $subscriptionEmail = SubscriptionEmail::firstOrNew(
+            ['subscription_id' => $subscriptionId]
+        );
+
+        $subscriptionEmail->fill([
+            'last_sent_at' => $now,
+            'next_scheduled_at' => $nextScheduled,
+            'status' => $status,
+            'updated_at' => $now,
+        ]);
+
+        return $subscriptionEmail->save();
     }
 }
