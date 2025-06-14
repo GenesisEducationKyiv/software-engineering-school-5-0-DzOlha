@@ -2,21 +2,40 @@
 
 namespace App\Infrastructure\Subscription\Listeners;
 
+use App\Application\Subscription\Services\EmailServiceInterface;
 use App\Domain\Subscription\Events\SubscriptionCreated;
-use App\Infrastructure\Subscription\Services\EmailService;
+use App\Domain\Subscription\Repositories\SubscriptionRepositoryInterface;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Log;
 
 class SendConfirmationEmail implements ShouldQueue
 {
     public function __construct(
-        private readonly EmailService $emailService
+        private readonly EmailServiceInterface $emailService,
+        private readonly SubscriptionRepositoryInterface $repository
     ) {
     }
 
     public function handle(SubscriptionCreated $event): void
     {
-        Log::info('SubscriptionCreated event received', ['subscription_id' => $event->subscription->getId()]);
-        $this->emailService->sendConfirmationEmail($event->subscription);
+        $id = $event->subscription->getId();
+
+        if (!$id) {
+            Log::warning('Subscription ID is null');
+            return;
+        }
+
+        Log::info('SubscriptionCreated event received', [
+            'subscription_id' => $id
+        ]);
+
+        $emailSent = $this->emailService->sendConfirmationEmail($event->subscription);
+
+        if (!$emailSent) {
+            $this->repository->delete($id);
+            Log::info(
+                "Subscription ID {$id} deleted due to failed confirmation email."
+            );
+        }
     }
 }
