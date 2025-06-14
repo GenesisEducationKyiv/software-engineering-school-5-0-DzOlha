@@ -2,12 +2,11 @@
 
 namespace App\Interfaces\Jobs;
 
+use App\Application\Subscription\Services\EmailServiceInterface;
 use App\Application\Weather\DTOs\WeatherRequestDTO;
+use App\Application\Weather\Services\WeatherServiceInterface;
 use App\Domain\Subscription\Entities\Subscription;
 use App\Domain\Subscription\Repositories\SubscriptionRepositoryInterface;
-use App\Domain\Weather\Services\WeatherService;
-use App\Infrastructure\Subscription\Models\SubscriptionEmail;
-use App\Infrastructure\Subscription\Services\EmailService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -23,13 +22,14 @@ class SendWeatherUpdates implements ShouldQueue
     use SerializesModels;
 
     public function __construct(
-        private int $subscriptionId
+        private readonly int $subscriptionId,
+        private readonly int $retryMinutes = 60
     ) {
     }
 
     public function handle(
-        WeatherService $weatherService,
-        EmailService $emailService,
+        WeatherServiceInterface $weatherService,
+        EmailServiceInterface $emailService,
         SubscriptionRepositoryInterface $subscriptionRepository
     ): void {
         Log::info('Running weather update job', ['subscription_id' => $this->subscriptionId]);
@@ -55,53 +55,48 @@ class SendWeatherUpdates implements ShouldQueue
             return;
         }
 
-        try {
-            $weatherData = $weatherService->getCurrentWeather(
-                new WeatherRequestDTO($subscription->getCity())
-            );
+        $weatherData = $weatherService->getCurrentWeather(
+            new WeatherRequestDTO($subscription->getCity())
+        );
 
-            $emailService->sendWeatherUpdate($subscription, $weatherData);
+        $sent = $emailService->sendWeatherUpdate($subscription, $weatherData);
 
+        if ($sent) {
             $intervalMinutes = $subscription->getFrequency()->getIntervalMinutes();
 
-            $this->updateSubscriptionEmailStatus($subscriptionId, 'success', $intervalMinutes);
+            $subscriptionRepository->updateSubscriptionEmailStatus(
+                $subscriptionId,
+                $intervalMinutes
+            );
 
             /**
              * Schedule the next update
              */
             self::dispatch($subscriptionId)->delay(now()->addMinutes($intervalMinutes));
-        } catch (\Throwable $e) {
+        }
+        else {
             Log::error('Failed to send weather update', [
-                'subscription_id' => $subscription->getId(),
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
+                'subscription_id' => $subscription->getId()
             ]);
 
             /**
              * Update with error status and retry in 60 minutes
              */
-            $this->updateSubscriptionEmailStatus($subscriptionId, 'error', 60);
+            $updated = $subscriptionRepository->updateSubscriptionEmailStatus(
+                $subscriptionId,
+                $this->retryMinutes,
+                false
+            );
+            if (!$updated) {
+                Log::error('Failed to update subscription email status', [
+                'subscription_id' => $subscription->getId()
+                ]);
+            }
 
             /**
              * Retry
              */
-            self::dispatch($subscriptionId)->delay(now()->addMinutes(60));
+            self::dispatch($subscriptionId)->delay(now()->addMinutes($this->retryMinutes));
         }
-    }
-
-    private function updateSubscriptionEmailStatus(int $subscriptionId, string $status, int $intervalMinutes): void
-    {
-        $now = now();
-        $nextScheduled = $now->addMinutes($intervalMinutes);
-
-        SubscriptionEmail::updateOrInsert(
-            ['subscription_id' => $subscriptionId],
-            [
-                'last_sent_at' => $now,
-                'next_scheduled_at' => $nextScheduled,
-                'status' => $status,
-                'updated_at' => $now,
-            ]
-        );
     }
 }
