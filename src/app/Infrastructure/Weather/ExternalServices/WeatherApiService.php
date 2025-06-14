@@ -3,7 +3,7 @@
 namespace App\Infrastructure\Weather\ExternalServices;
 
 use App\Domain\Weather\Repositories\WeatherRepositoryInterface;
-use App\Domain\Weather\ValueObjects\City;
+use App\Domain\Weather\ValueObjects\City\City;
 use App\Domain\Weather\ValueObjects\WeatherData;
 use App\Exceptions\Custom\ApiAccessException;
 use App\Exceptions\Custom\CityNotFoundException;
@@ -16,10 +16,9 @@ class WeatherApiService implements WeatherRepositoryInterface
 
     private int $cityNotFoundCode = 1006;
 
-    private string $currentWeatherEndpoint = '/current.json';
-
-    public function __construct()
-    {
+    public function __construct(
+        private readonly string $currentWeatherEndpoint = '/current.json'
+    ) {
         $key = config('services.weather.api_key');
         $url = config('services.weather.api_url');
 
@@ -39,7 +38,7 @@ class WeatherApiService implements WeatherRepositoryInterface
         try {
             $response = Http::get($this->apiUrl . $this->currentWeatherEndpoint, [
                 'key' => $this->apiKey,
-                'q' => $city->getName()
+                'q'   => $city->getName()
             ]);
 
             if ($response->successful()) {
@@ -76,7 +75,7 @@ class WeatherApiService implements WeatherRepositoryInterface
         try {
             $response = Http::get($this->apiUrl . $this->currentWeatherEndpoint, [
                 'key' => $this->apiKey,
-                'q' => $city->getName()
+                'q'   => $city->getName()
             ]);
 
             if ($response->successful()) {

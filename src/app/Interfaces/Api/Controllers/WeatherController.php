@@ -4,7 +4,7 @@ namespace App\Interfaces\Api\Controllers;
 
 use App\Application\Weather\DTOs\WeatherRequestDTO;
 use App\Application\Weather\Queries\GetCurrentWeatherQuery;
-use App\Domain\Weather\ValueObjects\City;
+use App\Domain\Weather\ValueObjects\City\City;
 use App\Exceptions\Custom\ApiAccessException;
 use App\Exceptions\Custom\CityNotFoundException;
 use App\Exceptions\ValidationException;
