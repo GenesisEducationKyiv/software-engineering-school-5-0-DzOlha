@@ -2,93 +2,54 @@
 
 namespace App\Infrastructure\Subscription\Services;
 
+use App\Application\Mail\MailerInterface;
+use App\Application\Subscription\Services\EmailServiceInterface;
+use App\Application\Subscription\Utils\SubscriptionUrlBuilderInterface;
 use App\Domain\Subscription\Entities\Subscription;
 use App\Domain\Weather\ValueObjects\WeatherData;
-use Illuminate\Mail\Mailable;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\URL;
+use App\Infrastructure\Subscription\Mails\Confirmation\ConfirmationMail;
+use App\Infrastructure\Subscription\Mails\Confirmation\ConfirmationMailData;
+use App\Infrastructure\Subscription\Mails\Update\WeatherUpdateMail;
+use App\Infrastructure\Subscription\Mails\Update\WeatherUpdateMailData;
 
-class EmailService
+class EmailService implements EmailServiceInterface
 {
-    private string $confirmWebEndpoint = "/confirm";
-    private string $unsubscribeWebEndpoint = "/unsubscribe";
-
-    public function sendConfirmationEmail(Subscription $subscription): void
-    {
-        $email = $subscription->getEmail()->getValue();
-        $token = $subscription->getConfirmationToken()?->getValue();
-
-        if (!$token) {
-            Log::info('Sending confirmation email to: '
-                                . $subscription->getEmail()
-                                . " was FAILED due to absent confirmation token");
-            return;
-        }
-
-        $confirmUrl = URL::to("{$this->confirmWebEndpoint}?token={$token}");
-
-        Mail::to($email)->send(new class ($confirmUrl, $subscription) extends Mailable {
-            public function __construct(
-                private readonly string $confirmUrl,
-                private readonly Subscription $subscription
-            ) {
-            }
-
-            public function build(): Mailable
-            {
-                Log::info('Sending confirmation email to: ' . $this->subscription->getEmail());
-
-                return $this->subject('Confirm your weather subscription')
-                    ->view('emails.confirm-subscription')
-                    ->with([
-                        'confirmUrl' => $this->confirmUrl,
-                        'subscription' => $this->subscription,
-                    ]);
-            }
-        });
+    public function __construct(
+        private MailerInterface $mailer,
+        private SubscriptionUrlBuilderInterface $urlBuilder
+    ) {
     }
 
-    public function sendWeatherUpdate(Subscription $subscription, WeatherData $weatherData): void
+    public function sendConfirmationEmail(Subscription $subscription): bool
     {
         $email = $subscription->getEmail()->getValue();
-        $city = $subscription->getCity()->getName();
-        $frequency = $subscription->getFrequency()->getName();
-        $unsubscribeToken = $subscription->getUnsubscribeToken()?->getValue();
+        $confirmUrl = $this->urlBuilder->buildConfirmationUrl($subscription);
 
-        if (!$unsubscribeToken) {
-            Log::info('Sending weather updates letter to: '
-                                . $subscription->getEmail()
-                                . " was FAILED due to absent unsubscribe token");
-            return;
+        if (!$confirmUrl) {
+            return false;
         }
 
-        $unsubscribeUrl = URL::to("{$this->unsubscribeWebEndpoint}?token={$unsubscribeToken}");
+        $mailData = new ConfirmationMailData($confirmUrl, $subscription);
 
-        Mail::to($email)->send(new class ($city, $frequency, $weatherData, $unsubscribeUrl) extends Mailable {
-            public function __construct(
-                private readonly string $city,
-                private readonly string $frequency,
-                private readonly WeatherData $weatherData,
-                private readonly string $unsubscribeUrl
-            ) {
-            }
+        return $this->mailer->send($email, new ConfirmationMail($mailData));
+    }
 
-            public function build(): Mailable
-            {
-                Log::info('Sending weather update');
+    public function sendWeatherUpdate(Subscription $subscription, WeatherData $weatherData): bool
+    {
+        $email = $subscription->getEmail()->getValue();
+        $unsubscribeUrl = $this->urlBuilder->buildUnsubscribeUrl($subscription);
 
-                return $this->subject("Weather update for {$this->city}")
-                    ->view('emails.weather-update')
-                    ->with([
-                        'city' => $this->city,
-                        'frequency' => $this->frequency,
-                        'temperature' => $this->weatherData->getTemperature(),
-                        'humidity' => $this->weatherData->getHumidity(),
-                        'description' => $this->weatherData->getDescription(),
-                        'unsubscribeUrl' => $this->unsubscribeUrl,
-                    ]);
-            }
-        });
+        if (!$unsubscribeUrl) {
+            return false;
+        }
+
+        $mailData = new WeatherUpdateMailData(
+            $subscription->getCity()->getName(),
+            $subscription->getFrequency()->getName(),
+            $weatherData,
+            $unsubscribeUrl
+        );
+
+        return $this->mailer->send($email, new WeatherUpdateMail($mailData));
     }
 }
