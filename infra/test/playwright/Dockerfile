@@ -4,12 +4,8 @@ WORKDIR /var/www/html/tests/e2e
 
 COPY ./src/tests/e2e/package*.json ./
 
-RUN npm cache clean --force
-RUN npm install -g npm@latest
-RUN npm install
+RUN npm ci && npx playwright install --with-deps
 
 COPY ./src/tests/e2e .
-
-RUN npx playwright install --with-deps
 
 CMD ["npx", "playwright", "test"]
