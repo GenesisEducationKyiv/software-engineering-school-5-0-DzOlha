@@ -1,0 +1,16 @@
+name: E2E Tests
+
+on:
+  workflow_dispatch:
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Build and run e2e tests
+        run: |
+          docker compose -f infra/test/docker-compose.yaml up --build --abort-on-container-exit --remove-orphans e2e-runner
+          docker compose -f infra/test/docker-compose.yaml down
