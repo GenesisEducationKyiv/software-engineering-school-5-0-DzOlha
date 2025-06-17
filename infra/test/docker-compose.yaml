@@ -1,80 +1,73 @@
 services:
-  # Runner for Unit Testing (no project setup needed)
-  unit-runner:
-    build:
-      context: ../../
-      dockerfile: infra/test/php/Dockerfile
-    entrypoint: [ "/usr/local/bin/entrypoint.sh" ]
-    command: [ "php", "artisan", "test", "tests/Unit" ]
-    environment:
-      RUN_MIGRATIONS: "false"
-      # Override Redis/Cache/Queue/Session to use array drivers for isolation
-    env_file:
-      - ./php/.env.unit
-
-  # Runner for Integration Testing (full project setup WITHOUT Nginx)
-  integration-runner:
-    build:
-      context: ../../
-      dockerfile: infra/test/php/Dockerfile
-    entrypoint: [ "/usr/local/bin/entrypoint.sh" ]
-    command: [ "php", "artisan", "test", "tests/Feature" ]
-    depends_on:
-      - postgres
-      - redis
-      - mailpit
-      - queue-runner
-    environment:
-      RUN_MIGRATIONS: "true"
-    env_file:
-      - ./php/.env
-
-  # Runner for End-To-End Testing (Playwright + full project setup WITH Nginx)
-  e2e-runner:
-    build:
-      context: ../../
-      dockerfile: infra/test/playwright/Dockerfile
-    depends_on:
-      - nginx
-    environment:
-      BASE_URL: http://nginx:80
-
-  nginx:
-    build:
-      context: ../../
-      dockerfile: infra/test/nginx/Dockerfile
-    depends_on:
-      - php
-
+  # PHP backend (Laravel via php-fpm)
   php:
     build:
       context: ../../
       dockerfile: infra/test/php/Dockerfile
     entrypoint: [ "/usr/local/bin/entrypoint.sh" ]
     command: [ "php-fpm" ]
-    depends_on:
-      - postgres
-      - redis
-      - mailpit
-      - queue-runner
+    environment:
+      RUN_MIGRATIONS: "true"
     env_file:
       - ./php/.env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      mailpit:
+        condition: service_healthy
+      queue-runner:
+        condition: service_started
+    healthcheck:
+      test: [ "CMD", "php", "-r", "echo 'OK';" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
+  # Nginx for frontend/backend proxy
+  nginx:
+    build:
+      context: ../../
+      dockerfile: infra/test/nginx/Dockerfile
+    depends_on:
+      php:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -fs http://localhost || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # PostgreSQL database
   postgres:
     build:
       context: ../../
       dockerfile: infra/test/postgres/Dockerfile
     env_file:
       - ./postgres/.env
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U $${POSTGRES_USER}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
+  # Redis for queues/cache
   redis:
     image: redis:8.0.1-alpine
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 3s
+      retries: 5
 
+  # Mail service
   mailpit:
     image: axllent/mailpit
     ports:
       - "1025:1025"  # SMTP
 
+  # Queue worker for Laravel jobs
   queue-runner:
     build:
       context: ../../
@@ -87,3 +80,50 @@ services:
       - redis
       - mailpit
 
+  # E2E tests via Playwright
+  e2e-runner:
+    build:
+      context: ../../
+      dockerfile: infra/test/playwright/Dockerfile
+    depends_on:
+      nginx:
+        condition: service_healthy
+      php:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    environment:
+      BASE_URL: http://nginx:80/
+
+  # Integration tests (PHP feature tests)
+  integration-runner:
+    build:
+      context: ../../
+      dockerfile: infra/test/php/Dockerfile
+    entrypoint: [ "/usr/local/bin/entrypoint.sh" ]
+    command: [ "php", "artisan", "test", "tests/Feature" ]
+    env_file:
+      - ./php/.env
+    environment:
+      RUN_MIGRATIONS: "true"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      mailpit:
+        condition: service_healthy
+      queue-runner:
+        condition: service_started
+
+  # Unit tests (lightweight, no infra)
+  unit-runner:
+    build:
+      context: ../../
+      dockerfile: infra/test/php/Dockerfile
+    entrypoint: [ "/usr/local/bin/entrypoint.sh" ]
+    command: [ "php", "artisan", "test", "tests/Unit" ]
+    env_file:
+      - ./php/.env.unit
+    environment:
+      RUN_MIGRATIONS: "false"
