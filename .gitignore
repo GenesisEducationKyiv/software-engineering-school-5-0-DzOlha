@@ -4,5 +4,3 @@
 /infra/prod/php/.env
 .idea/
 /src/.phpcs-cache
-/infra/test/php/.env
-/infra/test/postgres/.env
