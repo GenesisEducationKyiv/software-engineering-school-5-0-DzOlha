@@ -1,0 +1,89 @@
+services:
+  # Runner for Unit Testing (no project setup needed)
+  unit-runner:
+    build:
+      context: ../../
+      dockerfile: infra/test/php/Dockerfile
+    entrypoint: [ "/usr/local/bin/entrypoint.sh" ]
+    command: [ "php", "artisan", "test", "tests/Unit" ]
+    environment:
+      RUN_MIGRATIONS: "false"
+      # Override Redis/Cache/Queue/Session to use array drivers for isolation
+    env_file:
+      - ./php/.env.unit
+
+  # Runner for Integration Testing (full project setup WITHOUT Nginx)
+  integration-runner:
+    build:
+      context: ../../
+      dockerfile: infra/test/php/Dockerfile
+    entrypoint: [ "/usr/local/bin/entrypoint.sh" ]
+    command: [ "php", "artisan", "test", "tests/Feature" ]
+    depends_on:
+      - postgres
+      - redis
+      - mailpit
+      - queue-runner
+    environment:
+      RUN_MIGRATIONS: "true"
+    env_file:
+      - ./php/.env
+
+  # Runner for End-To-End Testing (Playwright + full project setup WITH Nginx)
+  e2e-runner:
+    build:
+      context: ../../
+      dockerfile: infra/test/playwright/Dockerfile
+    depends_on:
+      - nginx
+    environment:
+      BASE_URL: http://nginx:80
+
+  nginx:
+    build:
+      context: ../../
+      dockerfile: infra/test/nginx/Dockerfile
+    depends_on:
+      - php
+
+  php:
+    build:
+      context: ../../
+      dockerfile: infra/test/php/Dockerfile
+    entrypoint: [ "/usr/local/bin/entrypoint.sh" ]
+    command: [ "php-fpm" ]
+    depends_on:
+      - postgres
+      - redis
+      - mailpit
+      - queue-runner
+    env_file:
+      - ./php/.env
+
+  postgres:
+    build:
+      context: ../../
+      dockerfile: infra/test/postgres/Dockerfile
+    env_file:
+      - ./postgres/.env
+
+  redis:
+    image: redis:8.0.1-alpine
+
+  mailpit:
+    image: axllent/mailpit
+    ports:
+      - "1025:1025"  # SMTP
+
+  queue-runner:
+    build:
+      context: ../../
+      dockerfile: infra/test/php/Dockerfile
+    command: [ "sh", "-c", "php artisan queue:work redis --sleep=3 --tries=3" ]
+    env_file:
+      - ./php/.env
+    depends_on:
+      - postgres
+      - redis
+      - mailpit
+
