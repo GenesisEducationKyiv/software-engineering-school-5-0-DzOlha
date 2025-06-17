@@ -21,11 +21,13 @@ class WeatherApiTest extends TestCase
 
     // ERROR MESSAGE CONSTANTS
     private const ERROR_MESSAGES = [
-        'city_not_found' => 'City not found',
-        'token_not_found' => 'Token not found',
+        'city_not_found'           => 'City not found',
+        'token_not_found'          => 'Token not found',
         'email_already_subscribed' => 'Email already subscribed',
-        'subscription_pending' => 'A subscription with the provided details is already pending. Please check your inbox to confirm it.',
-        'subscription_success' => 'Subscription successful. Confirmation email sent. Please check your inbox.',
+        'subscription_pending'     =>
+            'A subscription with the provided details is already pending. Please check your inbox to confirm it.',
+        'subscription_success'     =>
+            'Subscription successful. Confirmation email sent. Please check your inbox.',
     ];
 
     protected function setUp(): void
@@ -37,8 +39,11 @@ class WeatherApiTest extends TestCase
     // WEATHER ENDPOINT TESTS
 
     #[DataProvider('weatherValidationProvider')]
-    public function test_get_current_weather_validation(string $queryString, int $expectedStatus, ?array $expectedErrors = null): void
-    {
+    public function test_get_current_weather_validation(
+        string $queryString,
+        int $expectedStatus,
+        ?array $expectedErrors = null
+    ): void {
         $response = $this->getJson($this->weatherUrl($queryString));
 
         $response->assertStatus($expectedStatus);
@@ -65,9 +70,9 @@ class WeatherApiTest extends TestCase
     public static function weatherValidationProvider(): array
     {
         return [
-            'missing city' => ['', 400, ['city']],
+            'missing city'   => ['', 400, ['city']],
             'city too short' => ['?city=A', 400, ['city']],
-            'city too long' => ['?city=' . str_repeat('a', 51), 400, ['city']],
+            'city too long'  => ['?city=' . str_repeat('a', 51), 400, ['city']],
         ];
     }
 
@@ -153,17 +158,17 @@ class WeatherApiTest extends TestCase
     public static function subscriptionValidationProvider(): array
     {
         return [
-            'invalid email' => [
+            'invalid email'     => [
                 ['email' => 'invalid', 'city' => 'Kyiv', 'frequency' => 'daily'],
                 400,
                 ['email']
             ],
-            'city too short' => [
+            'city too short'    => [
                 ['email' => 'test@gmail.com', 'city' => 'A', 'frequency' => 'daily'],
                 400,
                 ['city']
             ],
-            'city too long' => [
+            'city too long'     => [
                 ['email' => 'test@gmail.com', 'city' => str_repeat('a', 51), 'frequency' => 'daily'],
                 400,
                 ['city']
@@ -173,7 +178,7 @@ class WeatherApiTest extends TestCase
                 400,
                 ['frequency']
             ],
-            'empty payload' => [
+            'empty payload'     => [
                 [],
                 400,
                 ['email', 'city', 'frequency']
@@ -202,7 +207,7 @@ class WeatherApiTest extends TestCase
         $this->assertTrue($subscription->fresh()->isActive());
     }
 
-   #[DataProvider('tokenValidationProvider')]
+    #[DataProvider('tokenValidationProvider')]
     public function test_confirm_subscription_token_validation(string $token, array $expectedErrors): void
     {
         $response = $this->getJson($this->confirmUrl($token));
@@ -262,7 +267,7 @@ class WeatherApiTest extends TestCase
     {
         return [
             'token too short' => ['abc', ['token']],
-            'token not hex' => ['z1234567890abcdef...', ['token']],
+            'token not hex'   => ['z1234567890abcdef...', ['token']],
         ];
     }
 
@@ -271,8 +276,8 @@ class WeatherApiTest extends TestCase
     private function getValidSubscriptionPayload(string $email = 'user@gmail.com'): array
     {
         return [
-            'email' => $email,
-            'city' => 'Kyiv',
+            'email'     => $email,
+            'city'      => 'Kyiv',
             'frequency' => 'daily',
         ];
     }
