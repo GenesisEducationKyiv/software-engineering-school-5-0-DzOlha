@@ -1,0 +1,114 @@
+<?php
+
+namespace Tests\Unit\Application\Subscription\Commands;
+
+use App\Application\Subscription\Commands\CreateSubscriptionCommand;
+use App\Application\Subscription\DTOs\CreateSubscriptionRequestDTO;
+use App\Domain\Subscription\Entities\Subscription;
+use App\Domain\Subscription\Services\SubscriptionService;
+use App\Domain\Subscription\ValueObjects\Token;
+use App\Exceptions\Custom\ApiAccessException;
+use App\Exceptions\Custom\CityNotFoundException;
+use App\Exceptions\Custom\EmailAlreadySubscribedException;
+use App\Exceptions\Custom\FrequencyNotFoundException;
+use App\Exceptions\Custom\SubscriptionAlreadyPendingException;
+use App\Exceptions\ValidationException;
+use Mockery;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
+use Random\RandomException;
+use Throwable;
+
+class CreateSubscriptionCommandTest extends TestCase
+{
+    private array $dtoData;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->dtoData = [
+            'email' => 'test@example.com',
+            'city' => 'Kyiv',
+            'frequency' => 'daily',
+        ];
+    }
+
+    protected function tearDown(): void
+    {
+        Mockery::close();
+        parent::tearDown();
+    }
+
+    /**
+     * @throws ValidationException
+     * @throws ApiAccessException
+     * @throws EmailAlreadySubscribedException
+     * @throws SubscriptionAlreadyPendingException
+     * @throws FrequencyNotFoundException
+     * @throws CityNotFoundException
+     * @throws RandomException
+     */
+    public function test_subscription_created_successfully(): void
+    {
+        $dto = new CreateSubscriptionRequestDTO(
+            $this->dtoData['email'],
+            $this->dtoData['city'],
+            $this->dtoData['frequency']
+        );
+
+        $token = Token::createConfirmation();
+
+        $subscription = Mockery::mock(Subscription::class);
+        $subscription->shouldReceive('getConfirmationToken')
+            ->once()
+            ->andReturn($token);
+
+        $subscriptionService = Mockery::mock(SubscriptionService::class);
+        $subscriptionService->shouldReceive('subscribe')
+            ->once()
+            ->withArgs(function ($email, $city, $frequency) {
+                return $email->getValue() === 'test@example.com' &&
+                    $city->getName() === 'Kyiv' &&
+                    $frequency->getName() === 'daily';
+            })
+            ->andReturn($subscription);
+
+        $command = new CreateSubscriptionCommand($subscriptionService);
+        $result = $command->execute($dto);
+
+        $this->assertEquals($token->getValue(), $result);
+    }
+
+    #[DataProvider('exceptionProvider')]
+    public function test_exceptions_are_thrown(Throwable $exception): void
+    {
+        $this->expectException(get_class($exception));
+
+        $dto = new CreateSubscriptionRequestDTO(
+            $this->dtoData['email'],
+            $this->dtoData['city'],
+            $this->dtoData['frequency']
+        );
+
+        $subscriptionService = Mockery::mock(SubscriptionService::class);
+        $subscriptionService->shouldReceive('subscribe')
+            ->once()
+            ->andThrow($exception);
+
+        $command = new CreateSubscriptionCommand($subscriptionService);
+        $command->execute($dto);
+    }
+
+    public static function exceptionProvider(): array
+    {
+        return [
+            'validation' => [new ValidationException(['email' => ['Invalid email']])],
+            'city_not_found' => [new CityNotFoundException()],
+            'api_error' => [new ApiAccessException()],
+            'frequency_missing' => [new FrequencyNotFoundException()],
+            'already_pending' => [new SubscriptionAlreadyPendingException()],
+            'already_subscribed' => [new EmailAlreadySubscribedException()],
+        ];
+    }
+}
