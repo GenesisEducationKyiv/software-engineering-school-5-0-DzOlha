@@ -1,0 +1,19 @@
+name: Unit Tests
+
+on:
+  push:
+    branches: [ '*' ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Build and run unit tests
+        run: |
+          docker compose -f infra/test/docker-compose.yaml up --build --abort-on-container-exit --remove-orphans unit-runner
+          docker compose -f infra/test/docker-compose.yaml down
