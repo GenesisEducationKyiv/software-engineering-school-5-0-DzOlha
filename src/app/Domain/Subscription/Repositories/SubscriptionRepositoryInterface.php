@@ -11,17 +11,17 @@ use App\Infrastructure\Subscription\Models\Subscription as SubscriptionModel;
 interface SubscriptionRepositoryInterface
 {
     /**
-     * @param SubscriptionEntity $subscriptionEntity
+     * @param SubscriptionEntity $entity
      * @return SubscriptionEntity
      * @throws FrequencyNotFoundException
      */
-    public function save(Subscription $subscriptionEntity): Subscription;
+    public function save(Subscription $entity): Subscription;
 
-    public function hasActiveSubscription(Subscription $subscription): bool;
+    public function hasActiveSubscription(Subscription $entity): bool;
 
     public function findSubscriptionById(int $id): ?Subscription;
 
-    public function getPendingSubscription(Subscription $subscription): ?SubscriptionModel;
+    public function getPendingSubscriptionId(Subscription $entity): ?int;
 
     public function hasValidConfirmationToken(int $subscriptionId): bool;
 
