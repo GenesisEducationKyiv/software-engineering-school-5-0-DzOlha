@@ -17,126 +17,172 @@ use App\Infrastructure\Subscription\Models\Subscription;
 use App\Infrastructure\Subscription\Models\SubscriptionEmail;
 use App\Infrastructure\Subscription\Models\SubscriptionToken;
 use App\Infrastructure\Subscription\Models\User;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Query\Builder;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class SubscriptionRepository implements SubscriptionRepositoryInterface
 {
     /**
-     * @param SubscriptionEntity $subscriptionEntity
+     * @param SubscriptionEntity $entity
      * @return SubscriptionEntity
      * @throws FrequencyNotFoundException
      */
-    public function save(SubscriptionEntity $subscriptionEntity): SubscriptionEntity
+    public function save(SubscriptionEntity $entity): SubscriptionEntity
     {
-        return DB::transaction(function () use ($subscriptionEntity) {
-            $user = User::firstOrCreate([
-                'email' => $subscriptionEntity->getEmail()->getValue()
-            ]);
+        return DB::transaction(function () use ($entity) {
+            $usersTable = User::getTableName();
+            $citiesTable = City::getTableName();
+            $frequenciesTable = Frequency::getTableName();
+            $subscriptionsTable = Subscription::getTableName();
 
-            $city = City::firstOrCreate([
-                'name' => $subscriptionEntity->getCity()->getName()
-            ]);
+            $userEmail = $entity->getEmail()->getValue();
 
-            $frequency = Frequency::where('name', $subscriptionEntity->getFrequency()->getName())->first();
-            if (!$frequency) {
+            $existingUserId = DB::table($usersTable)
+                ->where('email', $userEmail)
+                ->value('id');
+
+            if (!$existingUserId) {
+                $userId = DB::table($usersTable)->insertGetId([
+                    'email'      => $userEmail,
+                    'created_at' => now()
+                ]);
+            } else {
+                $userId = $existingUserId;
+            }
+
+            $cityName = $entity->getCity()->getName();
+
+            $existingCityId = DB::table($citiesTable)
+                ->where('name', $cityName)
+                ->value('id');
+
+            if (!$existingCityId) {
+                $cityId = DB::table($citiesTable)->insertGetId([
+                    'name'       => $cityName,
+                    'created_at' => now()
+                ]);
+            } else {
+                $cityId = $existingCityId;
+            }
+
+            $frequencyName = $entity->getFrequency()->getName();
+
+            $frequencyId = DB::table($frequenciesTable)
+                ->where('name', $frequencyName)
+                ->value('id');
+
+            if (!$frequencyId) {
                 throw new FrequencyNotFoundException();
             }
 
-            $subscription = new Subscription([
-                'user_id'      => $user->id,
-                'city_id'      => $city->id,
-                'frequency_id' => $frequency->id,
-                'status'       => $subscriptionEntity->getStatus()->getValue()
+            $subscriptionId = DB::table($subscriptionsTable)->insertGetId([
+                'user_id'      => $userId,
+                'city_id'      => $cityId,
+                'frequency_id' => $frequencyId,
+                'status'       => $entity->getStatus()->getValue(),
+                'created_at'   => now()
             ]);
-            $subscription->save();
 
-            $subscriptionEntity->setId($subscription->id);
+            $entity->setId($subscriptionId);
 
-            if ($subscriptionEntity->getConfirmationToken() !== null) {
+            if ($entity->getConfirmationToken() !== null) {
                 $this->saveToken(
-                    $subscription->id,
-                    $subscriptionEntity->getConfirmationToken()->getValue(),
+                    $subscriptionId,
+                    $entity->getConfirmationToken()->getValue(),
                     'confirm',
-                    $subscriptionEntity->getConfirmationToken()->getExpiresAt()
+                    $entity->getConfirmationToken()->getExpiresAt()
                 );
             }
 
-            if ($subscriptionEntity->getUnsubscribeToken() !== null) {
+            if ($entity->getUnsubscribeToken() !== null) {
                 $this->saveToken(
-                    $subscription->id,
-                    $subscriptionEntity->getUnsubscribeToken()->getValue(),
+                    $subscriptionId,
+                    $entity->getUnsubscribeToken()->getValue(),
                     'cancel'
                 );
             }
 
-            return $subscriptionEntity;
+            return $entity;
         });
     }
 
     public function findSubscriptionById(int $id): ?SubscriptionEntity
     {
-        /** @var Subscription|null $subscription */
-        $subscription = Subscription::with([
-            'user',
-            'city',
-            'frequency',
-            'tokens' => function (HasMany $query) {
-                $query->whereIn('type', ['confirm', 'cancel'])
-                    ->where(function (Builder $q) {
-                        $q->whereNull('expires_at')
-                            ->orWhere('expires_at', '>', now());
-                    });
-            },
-        ])->find($id);
+        $subscriptionTable = Subscription::getTableName();
+        $userTable = User::getTableName();
+        $cityTable = City::getTableName();
+        $frequencyTable = Frequency::getTableName();
+        $tokenTable = SubscriptionToken::getTableName();
 
-        if (
-            !$subscription ||
-            !$subscription->user ||
-            !$subscription->city ||
-            !$subscription->frequency
-        ) {
+        /** @var object{
+         *     id: int,
+         *     status: string,
+         *     user_email: string,
+         *     city_name: string,
+         *     frequency_id: int,
+         *     frequency_name: string
+         *   }
+         *   |null $subscription
+         */
+        $subscription = DB::table("{$subscriptionTable} as s")
+            ->join("{$userTable} as u", 's.user_id', '=', 'u.id')
+            ->join("{$cityTable} as c", 's.city_id', '=', 'c.id')
+            ->join("{$frequencyTable} as f", 's.frequency_id', '=', 'f.id')
+            ->where('s.id', $id)
+            ->select(
+                's.id',
+                's.status',
+                'u.email as user_email',
+                'c.name as city_name',
+                'f.id as frequency_id',
+                'f.name as frequency_name'
+            )
+            ->first();
+
+        if (!$subscription) {
             return null;
         }
 
+        /** @var Collection<string, object{
+         *     token: string,
+         *     type: string,
+         *     expires_at: string|null
+         * }> $tokens
+         */
+        $tokens = DB::table($tokenTable)
+            ->where('subscription_id', $subscription->id)
+            ->whereIn('type', ['confirm', 'cancel'])
+            ->where(function (Builder $query) {
+                $query->whereNull('expires_at')
+                    ->orWhere('expires_at', '>', now());
+            })
+            ->get()
+            ->keyBy('type');
+
         $subscriptionEntity = new SubscriptionEntity(
-            new Email($subscription->user->email),
-            new CityValueObject($subscription->city->name),
-            FrequencyValueObject::fromId(
-                $subscription->frequency->id,
-                $subscription->frequency->name
-            ),
+            new Email($subscription->user_email),
+            new CityValueObject($subscription->city_name),
+            FrequencyValueObject::fromId($subscription->frequency_id, $subscription->frequency_name),
             Status::fromString($subscription->status)
         );
         $subscriptionEntity->setId($subscription->id);
 
-        $tokens = $subscription->tokens ?? collect();
-
-        /**
-         * @var ?SubscriptionToken $confirmToken
-         */
-        $confirmToken = $tokens->firstWhere('type', 'confirm');
-
-        /**
-         * @var ?SubscriptionToken $cancelToken
-         */
-        $cancelToken = $tokens->firstWhere('type', 'cancel');
-
-        if ($confirmToken) {
-            $expiresAt = $confirmToken->expires_at ? new \DateTimeImmutable($confirmToken->expires_at) : null;
-
+        if (isset($tokens['confirm'])) {
+            $token = $tokens['confirm'];
+            $expiresAt = $token->expires_at ? new \DateTimeImmutable($token->expires_at) : null;
             $subscriptionEntity->setConfirmationToken(new TokenValueObject(
-                $confirmToken->token,
-                TokenType::fromString($confirmToken->type),
+                $token->token,
+                TokenType::fromString($token->type),
                 $expiresAt
             ));
         }
 
-        if ($cancelToken) {
+        if (isset($tokens['cancel'])) {
+            $token = $tokens['cancel'];
             $subscriptionEntity->setUnsubscribeToken(new TokenValueObject(
-                $cancelToken->token,
-                TokenType::fromString($cancelToken->type),
+                $token->token,
+                TokenType::fromString($token->type),
                 null
             ));
         }
@@ -150,48 +196,77 @@ class SubscriptionRepository implements SubscriptionRepositoryInterface
         string $type,
         ?\DateTimeInterface $expiresAt = null
     ): void {
-        SubscriptionToken::create([
+        $table = SubscriptionToken::getTableName();
+
+        DB::table($table)->insert([
             'subscription_id' => $subscriptionId,
             'token'           => $token,
             'type'            => $type,
-            'expires_at'      => $expiresAt
+            'expires_at'      => $expiresAt,
+            'created_at'      => now(),
+            'updated_at'      => now(),
         ]);
     }
 
-    public function hasActiveSubscription(SubscriptionEntity $subscription): bool
+    public function hasActiveSubscription(SubscriptionEntity $entity): bool
     {
-        return Subscription::query()
-            ->join('users', 'subscriptions.user_id', '=', 'users.id')
-            ->join('cities', 'subscriptions.city_id', '=', 'cities.id')
-            ->join('frequencies', 'subscriptions.frequency_id', '=', 'frequencies.id')
-            ->where('users.email', $subscription->getEmail()->getValue())
-            ->where('cities.name', $subscription->getCity()->getName())
-            ->where('frequencies.name', $subscription->getFrequency()->getName())
-            ->where('subscriptions.status', 'active')
+        $subs = Subscription::getTableName();
+        $users = User::getTableName();
+        $cities = City::getTableName();
+        $freqs = Frequency::getTableName();
+
+        return DB::table($subs)
+            ->join($users, "$subs.user_id", '=', "$users.id")
+            ->join($cities, "$subs.city_id", '=', "$cities.id")
+            ->join($freqs, "$subs.frequency_id", '=', "$freqs.id")
+            ->where([
+                ["$users.email", '=', $entity->getEmail()->getValue()],
+                ["$cities.name", '=', $entity->getCity()->getName()],
+                ["$freqs.name", '=', $entity->getFrequency()->getName()],
+                ["$subs.status", '=', 'active'],
+            ])
             ->exists();
     }
 
-    public function getPendingSubscription(SubscriptionEntity $subscription): ?Subscription
+    /**
+     * @param SubscriptionEntity $entity
+     * @return int|null
+     */
+    public function getPendingSubscriptionId(SubscriptionEntity $entity): ?int
     {
-        return Subscription::query()
-            ->join('users', 'subscriptions.user_id', '=', 'users.id')
-            ->join('cities', 'subscriptions.city_id', '=', 'cities.id')
-            ->join('frequencies', 'subscriptions.frequency_id', '=', 'frequencies.id')
-            ->where('users.email', $subscription->getEmail()->getValue())
-            ->where('cities.name', $subscription->getCity()->getName())
-            ->where('frequencies.name', $subscription->getFrequency()->getName())
-            ->where('subscriptions.status', 'pending')
-            ->select('subscriptions.*')
-            ->first();
+        $subs = Subscription::getTableName();
+        $users = User::getTableName();
+        $cities = City::getTableName();
+        $freqs = Frequency::getTableName();
+
+        $pendingSubscriptionId = DB::table($subs)
+            ->join($users, "$subs.user_id", '=', "$users.id")
+            ->join($cities, "$subs.city_id", '=', "$cities.id")
+            ->join($freqs, "$subs.frequency_id", '=', "$freqs.id")
+            ->where([
+                ["$users.email", '=', $entity->getEmail()->getValue()],
+                ["$cities.name", '=', $entity->getCity()->getName()],
+                ["$freqs.name", '=', $entity->getFrequency()->getName()],
+                ["$subs.status", '=', 'pending'],
+            ])
+            ->value("$subs.id");
+
+        if (!is_numeric($pendingSubscriptionId)) {
+            return null;
+        }
+
+        return (int)$pendingSubscriptionId;
     }
 
     public function hasValidConfirmationToken(int $subscriptionId): bool
     {
-        return SubscriptionToken::query()
+        $table = SubscriptionToken::getTableName();
+
+        return DB::table($table)
             ->where('subscription_id', $subscriptionId)
             ->where('type', 'confirm')
-            ->where(function ($q) {
-                $q->whereNull('expires_at')
+            ->where(function (Builder $query) {
+                $query->whereNull('expires_at')
                     ->orWhere('expires_at', '>', now());
             })
             ->exists();
@@ -202,11 +277,11 @@ class SubscriptionRepository implements SubscriptionRepositoryInterface
         TokenValueObject $confirm,
         TokenValueObject $cancel
     ): void {
-        SubscriptionToken::query()
-            ->where('subscription_id', $subscriptionId)
-            ->delete();
+        $table = SubscriptionToken::getTableName();
 
-        SubscriptionToken::insert([
+        DB::table($table)->where('subscription_id', $subscriptionId)->delete();
+
+        DB::table($table)->insert([
             [
                 'subscription_id' => $subscriptionId,
                 'token'           => $confirm->getValue(),
@@ -228,57 +303,73 @@ class SubscriptionRepository implements SubscriptionRepositoryInterface
 
     public function delete(int $subscriptionId): bool
     {
-        return Subscription::query()
+        $table = Subscription::getTableName();
+
+        return DB::table($table)
                 ->where('id', $subscriptionId)
                 ->delete() > 0;
     }
 
     public function confirmSubscriptionByToken(string $token): ?SubscriptionEntity
     {
-        return DB::transaction(function () use ($token) {
-            $tokenModel = SubscriptionToken::where('token', $token)
+        $subscriptionTokensTable = SubscriptionToken::getTableName();
+        $subscriptionsTable = Subscription::getTableName();
+
+        return DB::transaction(function () use ($token, $subscriptionTokensTable, $subscriptionsTable) {
+            /** @var object{id: int, subscription_id: int}|null $tokenRecord */
+            $tokenRecord = DB::table($subscriptionTokensTable)
+                ->where('token', $token)
                 ->where('type', 'confirm')
-                ->where(function ($q) {
-                    $q->whereNull('expires_at')
-                        ->orWhere('expires_at', '>', now());
-                })
+                ->where('expires_at', '>', now())
+                ->select('id', 'subscription_id')
                 ->first();
 
-            if (!$tokenModel) {
+            if (!$tokenRecord) {
                 return null;
             }
 
-            $updated = Subscription::where('id', $tokenModel->subscription_id)
+            $updated = DB::table($subscriptionsTable)
+                ->where('id', $tokenRecord->subscription_id)
                 ->update(['status' => 'active']);
 
             if (!$updated) {
                 return null;
             }
 
-            SubscriptionToken::where('id', $tokenModel->id)->delete();
+            DB::table($subscriptionTokensTable)
+                ->where('id', $tokenRecord->id)
+                ->delete();
 
-            return $this->findSubscriptionById($tokenModel->subscription_id);
+            return $this->findSubscriptionById($tokenRecord->subscription_id);
         });
     }
 
     public function unsubscribeByToken(string $token): ?SubscriptionEntity
     {
-        return DB::transaction(function () use ($token) {
-            $tokenModel = SubscriptionToken::where('token', $token)
+        $subscriptionTokensTable = SubscriptionToken::getTableName();
+        $subscriptionsTable = Subscription::getTableName();
+
+        return DB::transaction(function () use ($token, $subscriptionTokensTable, $subscriptionsTable) {
+            /** @var object{subscription_id: int}|null $tokenRecord */
+            $tokenRecord = DB::table($subscriptionTokensTable)
+                ->where('token', $token)
                 ->where('type', 'cancel')
+                ->select('subscription_id')
                 ->first();
 
-            if (!$tokenModel) {
+            if (!$tokenRecord) {
                 return null;
             }
 
-            $subscriptionEntity = $this->findSubscriptionById($tokenModel->subscription_id);
+            $subscriptionEntity = $this->findSubscriptionById($tokenRecord->subscription_id);
 
             if (!$subscriptionEntity) {
                 return null;
             }
 
-            Subscription::where('id', $tokenModel->subscription_id)->delete();
+            DB::table($subscriptionsTable)
+                ->where('id', $tokenRecord->subscription_id)
+                ->delete();
 
             return $subscriptionEntity;
         });
@@ -294,17 +385,31 @@ class SubscriptionRepository implements SubscriptionRepositoryInterface
         $now = now();
         $nextScheduled = $now->copy()->addMinutes($intervalMinutes);
 
-        $subscriptionEmail = SubscriptionEmail::firstOrNew(
-            ['subscription_id' => $subscriptionId]
-        );
+        $table = SubscriptionEmail::getTableName();
 
-        $subscriptionEmail->fill([
-            'last_sent_at' => $now,
+        /** @var int|null $existingId */
+        $existingId = DB::table($table)
+            ->where('subscription_id', $subscriptionId)
+            ->value('id');
+
+        if ($existingId !== null) {
+            return DB::table($table)
+                    ->where('subscription_id', $subscriptionId)
+                    ->update([
+                        'last_sent_at'      => $now,
+                        'next_scheduled_at' => $nextScheduled,
+                        'status'            => $status,
+                        'updated_at'        => $now,
+                    ]) > 0;
+        }
+
+        return DB::table($table)->insert([
+            'subscription_id'   => $subscriptionId,
+            'last_sent_at'      => $now,
             'next_scheduled_at' => $nextScheduled,
-            'status' => $status,
-            'updated_at' => $now,
+            'status'            => $status,
+            'created_at'        => $now,
+            'updated_at'        => $now,
         ]);
-
-        return $subscriptionEmail->save();
     }
 }
