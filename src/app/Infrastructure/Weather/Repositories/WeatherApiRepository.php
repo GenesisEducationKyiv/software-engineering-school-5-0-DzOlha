@@ -9,7 +9,7 @@ use App\Exceptions\Custom\ApiAccessException;
 use App\Exceptions\Custom\CityNotFoundException;
 use Illuminate\Support\Facades\Http;
 
-class WeatherRepository implements WeatherRepositoryInterface
+class WeatherApiRepository implements WeatherRepositoryInterface
 {
     private string $apiKey;
     private string $apiUrl;
