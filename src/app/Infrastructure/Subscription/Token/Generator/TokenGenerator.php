@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Domain\Subscription\ValueObjects\Token\Generator;
+namespace App\Infrastructure\Subscription\Token\Generator;
 
+use App\Domain\Subscription\ValueObjects\Token\Generator\TokenGeneratorInterface;
 use Random\RandomException;
 
 class TokenGenerator implements TokenGeneratorInterface
