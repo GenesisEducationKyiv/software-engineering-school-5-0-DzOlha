@@ -10,7 +10,7 @@ use App\Domain\Subscription\Events\SubscriptionCreated;
 use App\Domain\Subscription\Repositories\SubscriptionRepositoryInterface;
 use App\Domain\Subscription\ValueObjects\Email\Email;
 use App\Domain\Subscription\ValueObjects\Frequency\Frequency;
-use App\Domain\Subscription\ValueObjects\Token\Token;
+use App\Domain\Subscription\ValueObjects\Token\Factory\TokenFactoryInterface;
 use App\Domain\Weather\Repositories\WeatherRepositoryInterface;
 use App\Domain\Weather\ValueObjects\City\City;
 use App\Exceptions\Custom\ApiAccessException;
@@ -25,6 +25,7 @@ class SubscriptionService implements SubscriptionServiceInterface
     public function __construct(
         private readonly SubscriptionRepositoryInterface $subscriptionRepository,
         private readonly WeatherRepositoryInterface $weatherRepository,
+        private readonly TokenFactoryInterface $tokenFactory
     ) {
     }
 
@@ -54,8 +55,8 @@ class SubscriptionService implements SubscriptionServiceInterface
                 throw new SubscriptionAlreadyPendingException();
             }
 
-            $newConfirmToken = Token::createConfirmation();
-            $newCancelToken = Token::createUnsubscribe();
+            $newConfirmToken = $this->tokenFactory->createConfirmation();
+            $newCancelToken = $this->tokenFactory->createCancel();
 
             $this->subscriptionRepository->replaceTokensForPending(
                 $existingPendingId,
@@ -72,8 +73,8 @@ class SubscriptionService implements SubscriptionServiceInterface
             return $subEntity;
         }
 
-        $subEntity->setConfirmationToken(Token::createConfirmation());
-        $subEntity->setUnsubscribeToken(Token::createUnsubscribe());
+        $subEntity->setConfirmationToken($this->tokenFactory->createConfirmation());
+        $subEntity->setUnsubscribeToken($this->tokenFactory->createCancel());
 
         $subscription = $this->subscriptionRepository->save($subEntity);
 

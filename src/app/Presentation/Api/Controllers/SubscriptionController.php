@@ -9,6 +9,7 @@ use App\Application\Subscription\DTOs\ConfirmSubscriptionRequestDTO;
 use App\Application\Subscription\DTOs\CreateSubscriptionRequestDTO;
 use App\Application\Subscription\DTOs\UnsubscribeRequestDTO;
 use App\Domain\Subscription\ValueObjects\Token\Token;
+use App\Domain\Subscription\ValueObjects\Token\TokenType;
 use App\Exceptions\Custom\ApiAccessException;
 use App\Exceptions\Custom\CityNotFoundException;
 use App\Exceptions\Custom\EmailAlreadySubscribedException;
@@ -70,7 +71,7 @@ class SubscriptionController extends Controller
     {
         try {
             $dto = new ConfirmSubscriptionRequestDTO(
-                Token::confirmation($token)
+                new Token($token, TokenType::CONFIRM)
             );
             $this->confirmSubscriptionCommand->execute($dto);
         } catch (ValidationException | TokenNotFoundException $e) {
@@ -91,7 +92,7 @@ class SubscriptionController extends Controller
     {
         try {
             $dto = new UnsubscribeRequestDTO(
-                Token::cancel($token)
+                new Token($token, TokenType::CANCEL)
             );
 
             $this->unsubscribeCommand->execute($dto);
