@@ -1,9 +1,9 @@
-@php use App\Infrastructure\Subscription\Mails\Update\WeatherUpdateMailData; @endphp
+@php use App\Application\Subscription\Emails\Mails\Update\WeatherUpdateMailData; @endphp
 @php
     /** @var WeatherUpdateMailData $data */
 @endphp
 
-<!DOCTYPE html>
+    <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8"/>
@@ -18,7 +18,8 @@
     </div>
     <div class="content">
         <p>Hello,</p>
-        <p>This is your <strong>{{ $data->getFrequency() }}</strong> weather update for <strong>{{ $data->getCity() }}</strong>:
+        <p>This is your <strong>{{ $data->getFrequency() }}</strong> weather update for
+            <strong>{{ $data->getCity() }}</strong>:
         </p>
 
         <div class="weather-box">
@@ -35,7 +36,8 @@
     Subscription frequency: <strong>{{ $data->getFrequency() }}</strong>
 </div>
 <div class="unsubscribe">
-    <a href="{{ $data->getUnsubscribeUrl() }}" target="_blank" rel="noopener noreferrer">Unsubscribe from these emails</a>
+    <a href="{{ $data->getUnsubscribeUrl() }}" target="_blank" rel="noopener noreferrer">Unsubscribe from these
+        emails</a>
 </div>
 </body>
 </html>

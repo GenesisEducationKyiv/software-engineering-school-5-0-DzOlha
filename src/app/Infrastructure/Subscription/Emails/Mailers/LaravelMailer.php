@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Infrastructure\Mail;
+namespace App\Infrastructure\Subscription\Emails\Mailers;
 
-use App\Application\Email\Mailers\MailerInterface;
+use App\Application\Subscription\Emails\Mailers\MailerInterface;
 use Illuminate\Mail\Mailable;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;

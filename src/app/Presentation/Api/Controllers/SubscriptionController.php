@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Interfaces\Api\Controllers;
+namespace App\Presentation\Api\Controllers;
 
 use App\Application\Subscription\Commands\ConfirmSubscriptionCommand;
 use App\Application\Subscription\Commands\CreateSubscriptionCommand;
@@ -16,7 +16,7 @@ use App\Exceptions\Custom\FrequencyNotFoundException;
 use App\Exceptions\Custom\SubscriptionAlreadyPendingException;
 use App\Exceptions\Custom\TokenNotFoundException;
 use App\Exceptions\ValidationException;
-use App\Interfaces\Api\Requests\SubscribeRequest;
+use App\Presentation\Api\Requests\SubscribeRequest;
 use Illuminate\Http\JsonResponse;
 
 class SubscriptionController extends Controller

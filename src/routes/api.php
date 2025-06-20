@@ -1,7 +1,7 @@
 <?php
 
-use App\Interfaces\Api\Controllers\SubscriptionController;
-use App\Interfaces\Api\Controllers\WeatherController;
+use App\Presentation\Api\Controllers\SubscriptionController;
+use App\Presentation\Api\Controllers\WeatherController;
 use Illuminate\Support\Facades\Route;
 
 /*

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Interfaces\Api\Controllers;
+namespace App\Presentation\Api\Controllers;
 
 use App\Exceptions\CustomException;
 use App\Exceptions\ValidationException;
