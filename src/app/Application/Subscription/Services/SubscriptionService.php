@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Domain\Subscription\Services;
+namespace App\Application\Subscription\Services\Impl;
 
 use App\Application\Subscription\DTOs\ConfirmSubscriptionRequestDTO;
 use App\Application\Subscription\DTOs\UnsubscribeRequestDTO;
-use App\Application\Subscription\Services\SubscriptionServiceInterface;
+use App\Application\Subscription\Services\Inter\SubscriptionServiceInterface;
 use App\Domain\Subscription\Entities\Subscription;
 use App\Domain\Subscription\Events\SubscriptionConfirmed;
 use App\Domain\Subscription\Events\SubscriptionCreated;

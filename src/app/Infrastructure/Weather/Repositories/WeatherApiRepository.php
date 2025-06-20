@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Infrastructure\Weather\ExternalServices;
+namespace App\Infrastructure\Weather\Repositories;
 
 use App\Domain\Weather\Repositories\WeatherRepositoryInterface;
 use App\Domain\Weather\ValueObjects\City\City;
@@ -9,7 +9,7 @@ use App\Exceptions\Custom\ApiAccessException;
 use App\Exceptions\Custom\CityNotFoundException;
 use Illuminate\Support\Facades\Http;
 
-class WeatherApiService implements WeatherRepositoryInterface
+class WeatherRepository implements WeatherRepositoryInterface
 {
     private string $apiKey;
     private string $apiUrl;

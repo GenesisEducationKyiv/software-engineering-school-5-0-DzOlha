@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Infrastructure\Subscription\Mails\Confirmation;
+namespace App\Application\Subscription\Emails\Mails\Confirmation;
 
 use App\Domain\Subscription\Entities\Subscription;
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domain\Weather\Services;
+namespace App\Infrastructure\Weather\Services;
 
 use App\Application\Weather\DTOs\WeatherRequestDTO;
 use App\Application\Weather\Services\WeatherServiceInterface;

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Application\Subscription\Services;
+namespace App\Application\Subscription\Emails;
 
 use App\Domain\Subscription\Entities\Subscription;
 use App\Domain\Weather\ValueObjects\WeatherData;
