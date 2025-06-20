@@ -2,16 +2,30 @@
 
 namespace App\Providers;
 
+use App\Application\Subscription\Emails\EmailServiceInterface;
+use App\Application\Subscription\Emails\Mailers\MailerInterface;
+use App\Application\Subscription\Emails\Services\EmailService;
+use App\Application\Subscription\Listeners\SendConfirmationEmail;
+use App\Application\Subscription\Listeners\SendWeatherUpdateEmail;
+use App\Application\Subscription\Services\SubscriptionService;
+use App\Application\Subscription\Services\SubscriptionServiceInterface;
+use App\Application\Subscription\Utils\Builders\SubscriptionLinkBuilderInterface;
+use App\Application\Weather\Services\WeatherService;
+use App\Application\Weather\Services\WeatherServiceInterface;
 use App\Domain\Subscription\Events\SubscriptionConfirmed;
 use App\Domain\Subscription\Events\SubscriptionCreated;
 use App\Domain\Subscription\Repositories\SubscriptionRepositoryInterface;
+use App\Domain\Subscription\ValueObjects\Token\Factory\TokenFactory;
+use App\Domain\Subscription\ValueObjects\Token\Factory\TokenFactoryInterface;
+use App\Domain\Subscription\ValueObjects\Token\Generator\TokenGeneratorInterface;
 use App\Domain\Weather\Repositories\WeatherRepositoryInterface;
-use App\Infrastructure\Subscription\Listeners\SendConfirmationEmail;
-use App\Infrastructure\Subscription\Listeners\SendWeatherUpdateEmail;
+use App\Infrastructure\Subscription\Emails\Mailers\LaravelMailer;
 use App\Infrastructure\Subscription\Repositories\SubscriptionRepository;
-use App\Infrastructure\Weather\ExternalServices\WeatherApiService;
-use Illuminate\Support\ServiceProvider;
+use App\Infrastructure\Subscription\Token\Generator\TokenGenerator;
+use App\Infrastructure\Subscription\Utils\Builders\SubscriptionLinkBuilder;
+use App\Infrastructure\Weather\Repositories\WeatherApiRepository;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -20,8 +34,19 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->bind(WeatherRepositoryInterface::class, WeatherApiService::class);
+        $this->app->bind(TokenGeneratorInterface::class, TokenGenerator::class);
+        $this->app->bind(TokenFactoryInterface::class, TokenFactory::class);
+
+        $this->app->bind(WeatherRepositoryInterface::class, WeatherApiRepository::class);
+        $this->app->bind(WeatherServiceInterface::class, WeatherService::class);
+
         $this->app->bind(SubscriptionRepositoryInterface::class, SubscriptionRepository::class);
+        $this->app->bind(SubscriptionServiceInterface::class, SubscriptionService::class);
+
+        $this->app->bind(MailerInterface::class, LaravelMailer::class);
+        $this->app->bind(EmailServiceInterface::class, EmailService::class);
+
+        $this->app->bind(SubscriptionLinkBuilderInterface::class, SubscriptionLinkBuilder::class);
     }
 
     /**

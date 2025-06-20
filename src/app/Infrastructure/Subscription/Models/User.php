@@ -8,6 +8,8 @@ use App\Infrastructure\Subscription\Models\Subscription;
 
 class User extends Model
 {
+    use TableName;
+
     public $timestamps = false;
 
     protected $fillable = ['email'];

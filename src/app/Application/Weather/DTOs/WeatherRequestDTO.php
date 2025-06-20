@@ -2,7 +2,7 @@
 
 namespace App\Application\Weather\DTOs;
 
-use App\Domain\Weather\ValueObjects\City;
+use App\Domain\Weather\ValueObjects\City\City;
 
 class WeatherRequestDTO
 {

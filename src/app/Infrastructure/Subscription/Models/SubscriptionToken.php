@@ -8,6 +8,8 @@ use App\Infrastructure\Subscription\Models\Subscription;
 
 class SubscriptionToken extends Model
 {
+    use TableName;
+
     protected $fillable = ['subscription_id', 'token', 'type', 'expires_at'];
 
     /**

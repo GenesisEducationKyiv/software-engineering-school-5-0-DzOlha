@@ -3,13 +3,13 @@
 namespace App\Application\Subscription\Commands;
 
 use App\Application\Subscription\DTOs\ConfirmSubscriptionRequestDTO;
-use App\Domain\Subscription\Services\SubscriptionService;
+use App\Application\Subscription\Services\SubscriptionServiceInterface;
 use App\Exceptions\Custom\TokenNotFoundException;
 
 class ConfirmSubscriptionCommand
 {
     public function __construct(
-        private readonly SubscriptionService $subscriptionService
+        private readonly SubscriptionServiceInterface $subscriptionService
     ) {
     }
 

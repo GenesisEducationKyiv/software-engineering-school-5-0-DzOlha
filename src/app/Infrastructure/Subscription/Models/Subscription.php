@@ -12,6 +12,8 @@ use App\Infrastructure\Subscription\Models\SubscriptionToken;
 
 class Subscription extends Model
 {
+    use TableName;
+
     public $timestamps = false;
 
     protected $fillable = ['user_id', 'city_id', 'frequency_id', 'status'];

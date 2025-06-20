@@ -2,11 +2,11 @@
 
 namespace App\Domain\Subscription\Entities;
 
-use App\Domain\Subscription\ValueObjects\Email;
-use App\Domain\Subscription\ValueObjects\Frequency;
-use App\Domain\Subscription\ValueObjects\Status;
-use App\Domain\Subscription\ValueObjects\Token;
-use App\Domain\Weather\ValueObjects\City;
+use App\Domain\Subscription\ValueObjects\Email\Email;
+use App\Domain\Subscription\ValueObjects\Frequency\Frequency;
+use App\Domain\Subscription\ValueObjects\Status\Status;
+use App\Domain\Subscription\ValueObjects\Token\Token;
+use App\Domain\Weather\ValueObjects\City\City;
 
 class Subscription
 {

@@ -2,7 +2,7 @@
 
 namespace App\Application\Subscription\DTOs;
 
-use App\Domain\Subscription\ValueObjects\Token;
+use App\Domain\Subscription\ValueObjects\Token\Token;
 
 class UnsubscribeRequestDTO
 {

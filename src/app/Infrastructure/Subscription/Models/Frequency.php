@@ -8,6 +8,8 @@ use App\Infrastructure\Subscription\Models\Subscription;
 
 class Frequency extends Model
 {
+    use TableName;
+
     protected $fillable = ['name', 'interval_minutes'];
 
     /**
