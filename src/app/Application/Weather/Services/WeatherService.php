@@ -1,9 +1,8 @@
 <?php
 
-namespace App\Infrastructure\Weather\Services;
+namespace App\Application\Weather\Services;
 
 use App\Application\Weather\DTOs\WeatherRequestDTO;
-use App\Application\Weather\Services\WeatherServiceInterface;
 use App\Domain\Weather\Repositories\WeatherRepositoryInterface;
 use App\Domain\Weather\ValueObjects\WeatherData;
 use App\Exceptions\Custom\ApiAccessException;
