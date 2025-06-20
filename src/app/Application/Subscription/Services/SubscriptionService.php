@@ -1,10 +1,9 @@
 <?php
 
-namespace App\Application\Subscription\Services\Impl;
+namespace App\Application\Subscription\Services;
 
 use App\Application\Subscription\DTOs\ConfirmSubscriptionRequestDTO;
 use App\Application\Subscription\DTOs\UnsubscribeRequestDTO;
-use App\Application\Subscription\Services\Inter\SubscriptionServiceInterface;
 use App\Domain\Subscription\Entities\Subscription;
 use App\Domain\Subscription\Events\SubscriptionConfirmed;
 use App\Domain\Subscription\Events\SubscriptionCreated;
@@ -47,9 +46,9 @@ class SubscriptionService implements SubscriptionServiceInterface
             throw new EmailAlreadySubscribedException();
         }
 
-        $existingPending = $this->subscriptionRepository->getPendingSubscription($subEntity);
-        if ($existingPending) {
-            $tokenStillValid = $this->subscriptionRepository->hasValidConfirmationToken($existingPending->id);
+        $existingPendingId = $this->subscriptionRepository->getPendingSubscriptionId($subEntity);
+        if ($existingPendingId) {
+            $tokenStillValid = $this->subscriptionRepository->hasValidConfirmationToken($existingPendingId);
 
             if ($tokenStillValid) {
                 throw new SubscriptionAlreadyPendingException();
@@ -59,12 +58,12 @@ class SubscriptionService implements SubscriptionServiceInterface
             $newCancelToken = Token::createUnsubscribe();
 
             $this->subscriptionRepository->replaceTokensForPending(
-                $existingPending->id,
+                $existingPendingId,
                 $newConfirmToken,
                 $newCancelToken
             );
 
-            $subEntity->setId($existingPending->id);
+            $subEntity->setId($existingPendingId);
             $subEntity->setConfirmationToken($newConfirmToken);
             $subEntity->setUnsubscribeToken($newCancelToken);
 

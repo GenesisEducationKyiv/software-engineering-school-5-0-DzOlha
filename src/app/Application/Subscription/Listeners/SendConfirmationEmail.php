@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Infrastructure\Subscription\Listeners;
+namespace App\Application\Subscription\Listeners;
 
-use App\Application\Subscription\Services\EmailServiceInterface;
+use App\Application\Subscription\Emails\EmailServiceInterface;
 use App\Domain\Subscription\Events\SubscriptionCreated;
 use App\Domain\Subscription\Repositories\SubscriptionRepositoryInterface;
 use Illuminate\Contracts\Queue\ShouldQueue;

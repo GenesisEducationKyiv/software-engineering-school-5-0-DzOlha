@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Infrastructure\Subscription\Listeners;
+namespace App\Application\Subscription\Listeners;
 
+use App\Application\Subscription\Jobs\SendWeatherUpdates;
 use App\Domain\Subscription\Events\SubscriptionConfirmed;
-use App\Interfaces\Jobs\SendWeatherUpdates;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Log;
 

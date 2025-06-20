@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Application\Job;
+namespace App\Application\Subscription\Jobs;
 
-use App\Application\Subscription\Services\EmailServiceInterface;
+use App\Application\Subscription\Emails\EmailServiceInterface;
 use App\Application\Weather\DTOs\WeatherRequestDTO;
 use App\Application\Weather\Services\WeatherServiceInterface;
 use App\Domain\Subscription\Entities\Subscription;
