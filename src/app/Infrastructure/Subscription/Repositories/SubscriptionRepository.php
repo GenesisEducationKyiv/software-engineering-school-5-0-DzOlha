@@ -21,6 +21,8 @@ use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
+use function Laravel\Prompts\table;
+
 class SubscriptionRepository implements SubscriptionRepositoryInterface
 {
     /**
@@ -265,10 +267,7 @@ class SubscriptionRepository implements SubscriptionRepositoryInterface
         return DB::table($table)
             ->where('subscription_id', $subscriptionId)
             ->where('type', 'confirm')
-            ->where(function (Builder $query) {
-                $query->whereNull('expires_at')
-                    ->orWhere('expires_at', '>', now());
-            })
+            ->where('expires_at', '>', now())
             ->exists();
     }
 
@@ -411,5 +410,18 @@ class SubscriptionRepository implements SubscriptionRepositoryInterface
             'created_at'        => $now,
             'updated_at'        => $now,
         ]);
+    }
+
+    public function expireConfirmationToken(int $subscriptionId): bool
+    {
+        $tokensTable = SubscriptionToken::getTableName();
+
+        return DB::table($tokensTable)
+                ->where('subscription_id', $subscriptionId)
+                ->where('type', 'confirm')
+                ->update([
+                    'expires_at' => now()->subHour(),
+                    'updated_at' => now(),
+                ]) > 0;
     }
 }

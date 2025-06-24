@@ -10,8 +10,6 @@ parameters:
     - app
     - routes
     - database
-    - config
-    - tests
     - resources/views
 
   excludePaths:
@@ -20,6 +18,7 @@ parameters:
     - vendor/*
     - public/*
     - config/*
+    - tests/*
 
   # Enhanced type checking
   inferPrivatePropertyTypeFromConstructor: true

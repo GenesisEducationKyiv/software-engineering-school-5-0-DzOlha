@@ -3,16 +3,14 @@
 namespace App\Domain\Subscription\Repositories;
 
 use App\Domain\Subscription\Entities\Subscription;
-use App\Domain\Subscription\Entities\Subscription as SubscriptionEntity;
 use App\Domain\Subscription\ValueObjects\Token\Token;
 use App\Exceptions\Custom\FrequencyNotFoundException;
-use App\Infrastructure\Subscription\Models\Subscription as SubscriptionModel;
 
 interface SubscriptionRepositoryInterface
 {
     /**
-     * @param SubscriptionEntity $entity
-     * @return SubscriptionEntity
+     * @param Subscription $entity
+     * @return Subscription
      * @throws FrequencyNotFoundException
      */
     public function save(Subscription $entity): Subscription;
@@ -38,4 +36,6 @@ interface SubscriptionRepositoryInterface
         int $intervalMinutes,
         bool $success = true
     ): bool;
+
+    public function expireConfirmationToken(int $subscriptionId): bool;
 }
