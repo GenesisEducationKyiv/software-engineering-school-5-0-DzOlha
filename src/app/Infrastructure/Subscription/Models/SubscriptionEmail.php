@@ -8,6 +8,8 @@ use App\Infrastructure\Subscription\Models\Subscription;
 
 class SubscriptionEmail extends Model
 {
+    use TableName;
+
     protected $fillable = ['subscription_id', 'last_sent_at', 'next_scheduled_at', 'status'];
 
     /**

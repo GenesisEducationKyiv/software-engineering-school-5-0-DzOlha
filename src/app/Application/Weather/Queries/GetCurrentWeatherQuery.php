@@ -4,14 +4,14 @@ namespace App\Application\Weather\Queries;
 
 use App\Application\Weather\DTOs\WeatherRequestDTO;
 use App\Application\Weather\DTOs\WeatherResponseDTO;
-use App\Domain\Weather\Services\WeatherService;
+use App\Application\Weather\Services\WeatherServiceInterface;
 use App\Exceptions\Custom\ApiAccessException;
 use App\Exceptions\Custom\CityNotFoundException;
 
 class GetCurrentWeatherQuery
 {
     public function __construct(
-        private readonly WeatherService $weatherService
+        private readonly WeatherServiceInterface $weatherService
     ) {
     }
 
