@@ -4,15 +4,18 @@ namespace Tests\Unit\Application\Subscription\Commands;
 
 use App\Application\Subscription\Commands\CreateSubscriptionCommand;
 use App\Application\Subscription\DTOs\CreateSubscriptionRequestDTO;
+use App\Application\Subscription\Services\SubscriptionService;
 use App\Domain\Subscription\Entities\Subscription;
-use App\Domain\Subscription\Services\SubscriptionService;
-use App\Domain\Subscription\ValueObjects\Token;
+use App\Domain\Subscription\ValueObjects\Token\Factory\TokenFactory;
+use App\Domain\Subscription\ValueObjects\Token\Factory\TokenFactoryInterface;
+use App\Domain\Subscription\ValueObjects\Token\Token;
 use App\Exceptions\Custom\ApiAccessException;
 use App\Exceptions\Custom\CityNotFoundException;
 use App\Exceptions\Custom\EmailAlreadySubscribedException;
 use App\Exceptions\Custom\FrequencyNotFoundException;
 use App\Exceptions\Custom\SubscriptionAlreadyPendingException;
 use App\Exceptions\ValidationException;
+use App\Infrastructure\Subscription\Token\Generator\TokenGenerator;
 use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -57,7 +60,7 @@ class CreateSubscriptionCommandTest extends TestCase
             $this->dtoData['frequency']
         );
 
-        $token = Token::createConfirmation();
+        $token = $this->generateConfirmationToken();
 
         $subscription = Mockery::mock(Subscription::class);
         $subscription->shouldReceive('getConfirmationToken')
@@ -98,6 +101,15 @@ class CreateSubscriptionCommandTest extends TestCase
 
         $command = new CreateSubscriptionCommand($subscriptionService);
         $command->execute($dto);
+    }
+
+    private function generateConfirmationToken(): Token
+    {
+        /**
+         * @var TokenFactoryInterface $factory
+         */
+        $factory = new TokenFactory(new TokenGenerator());
+        return $factory->createConfirmation();
     }
 
     public static function exceptionProvider(): array

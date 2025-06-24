@@ -4,8 +4,8 @@ namespace Application\Subscription\Commands;
 
 use App\Application\Subscription\Commands\ConfirmSubscriptionCommand;
 use App\Application\Subscription\DTOs\ConfirmSubscriptionRequestDTO;
+use App\Application\Subscription\Services\SubscriptionServiceInterface;
 use App\Domain\Subscription\Entities\Subscription;
-use App\Domain\Subscription\Services\SubscriptionService;
 use App\Exceptions\Custom\TokenNotFoundException;
 use PHPUnit\Framework\TestCase;
 use Mockery;
@@ -18,12 +18,15 @@ class ConfirmSubscriptionCommandTest extends TestCase
         parent::tearDown();
     }
 
+    /**
+     * @throws TokenNotFoundException
+     */
     public function test_subscription_confirmed_successfully(): void
     {
         $dto = Mockery::mock(ConfirmSubscriptionRequestDTO::class);
         $subscription = Mockery::mock(Subscription::class);
 
-        $subscriptionService = Mockery::mock(SubscriptionService::class);
+        $subscriptionService = Mockery::mock(SubscriptionServiceInterface::class);
         $subscriptionService
             ->shouldReceive('confirmSubscription')
             ->once()
@@ -36,11 +39,14 @@ class ConfirmSubscriptionCommandTest extends TestCase
         $this->assertTrue($result);
     }
 
+    /**
+     * @throws TokenNotFoundException
+     */
     public function test_subscription_not_found(): void
     {
         $dto = Mockery::mock(ConfirmSubscriptionRequestDTO::class);
 
-        $subscriptionService = Mockery::mock(SubscriptionService::class);
+        $subscriptionService = Mockery::mock(SubscriptionServiceInterface::class);
         $subscriptionService
             ->shouldReceive('confirmSubscription')
             ->once()
@@ -59,7 +65,7 @@ class ConfirmSubscriptionCommandTest extends TestCase
 
         $dto = Mockery::mock(ConfirmSubscriptionRequestDTO::class);
 
-        $subscriptionService = Mockery::mock(SubscriptionService::class);
+        $subscriptionService = Mockery::mock(SubscriptionServiceInterface::class);
         $subscriptionService
             ->shouldReceive('confirmSubscription')
             ->once()

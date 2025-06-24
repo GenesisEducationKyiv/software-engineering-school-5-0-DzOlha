@@ -4,11 +4,13 @@ namespace Tests\Unit\Application\Subscription\Commands;
 
 use App\Application\Subscription\Commands\UnsubscribeCommand;
 use App\Application\Subscription\DTOs\UnsubscribeRequestDTO;
-use App\Domain\Subscription\Entities\Subscription;
-use App\Domain\Subscription\Services\SubscriptionService;
-use App\Domain\Subscription\ValueObjects\Token;
+use App\Application\Subscription\Services\SubscriptionService;
+use App\Domain\Subscription\ValueObjects\Token\Factory\TokenFactory;
+use App\Domain\Subscription\ValueObjects\Token\Factory\TokenFactoryInterface;
+use App\Domain\Subscription\ValueObjects\Token\Token;
 use App\Exceptions\Custom\TokenNotFoundException;
 use App\Exceptions\ValidationException;
+use App\Infrastructure\Subscription\Token\Generator\TokenGenerator;
 use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -35,7 +37,7 @@ class UnsubscribeCommandTest extends TestCase
     public function test_unsubscribe_successful(): void
     {
         $dto = new UnsubscribeRequestDTO(
-            Token::createUnsubscribe()
+            $this->generateUnsubscribeToken()
         );
 
         $subscriptionService = Mockery::mock(SubscriptionService::class);
@@ -61,7 +63,7 @@ class UnsubscribeCommandTest extends TestCase
         $this->expectException($exceptionClass);
 
         $dto = new UnsubscribeRequestDTO(
-            Token::createUnsubscribe()
+            $this->generateUnsubscribeToken()
         );
 
         $subscriptionService = Mockery::mock(SubscriptionService::class);
@@ -72,6 +74,15 @@ class UnsubscribeCommandTest extends TestCase
 
         $command = new UnsubscribeCommand($subscriptionService);
         $command->execute($dto);
+    }
+
+    private function generateUnsubscribeToken(): Token
+    {
+        /**
+         * @var TokenFactoryInterface $factory
+         */
+        $factory = new TokenFactory(new TokenGenerator());
+        return $factory->createCancel();
     }
 
     public static function exceptionProvider(): array

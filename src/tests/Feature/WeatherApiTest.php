@@ -4,9 +4,9 @@ namespace Tests\Feature;
 
 use App\Domain\Subscription\Entities\Subscription;
 use App\Domain\Subscription\Repositories\SubscriptionRepositoryInterface;
-use App\Domain\Subscription\ValueObjects\Email;
-use App\Domain\Subscription\ValueObjects\Frequency;
-use App\Domain\Weather\ValueObjects\City;
+use App\Domain\Subscription\ValueObjects\Email\Email;
+use App\Domain\Subscription\ValueObjects\Frequency\Frequency;
+use App\Domain\Weather\ValueObjects\City\City;
 use App\Exceptions\ValidationException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\App;
@@ -121,9 +121,12 @@ class WeatherApiTest extends TestCase
         $response->assertStatus(409)
             ->assertJsonFragment(['message' => self::ERROR_MESSAGES['email_already_subscribed']]);
 
-        $this->assertTrue($subscription->fresh()->isActive());
+        $this->assertTrue($subscription->isActive());
     }
 
+    /**
+     * @throws ValidationException
+     */
     public function test_subscribe_expired_token_resend(): void
     {
         $payload = $this->getValidSubscriptionPayload('expired@gmail.com');
@@ -132,7 +135,10 @@ class WeatherApiTest extends TestCase
         $this->postJson($this->subscribeUrl(), $payload)->assertOk();
 
         $subscription = $this->getPendingSubscription($payload);
-        $this->expireConfirmationToken($subscription);
+
+        $expired = $this->repository->expireConfirmationToken($subscription->getId());
+
+        $this->assertTrue($expired);
 
         // Resend should work
         $response = $this->postJson($this->subscribeUrl(), $payload);
@@ -197,14 +203,15 @@ class WeatherApiTest extends TestCase
         $this->postJson($this->subscribeUrl(), $payload)->assertOk();
 
         $subscription = $this->getPendingSubscription($payload);
-        $confirmationToken = $this->getTokenFromSubscription($subscription, 'confirm');
+        $confirmationToken = $subscription->getConfirmationToken()->getValue();
 
         $response = $this->getJson($this->confirmUrl($confirmationToken));
 
         $response->assertOk()
             ->assertJsonFragment(['success' => true]);
 
-        $this->assertTrue($subscription->fresh()->isActive());
+        $subscription = $this->getSubscription($subscription->getId());
+        $this->assertTrue($subscription->isActive());
     }
 
     #[DataProvider('tokenValidationProvider')]
@@ -236,7 +243,7 @@ class WeatherApiTest extends TestCase
         $payload = $this->getValidSubscriptionPayload('unsubscribe@gmail.com');
         $subscription = $this->createAndConfirmSubscription($payload);
 
-        $cancellationToken = $this->getTokenFromSubscription($subscription, 'cancel');
+        $cancellationToken = $subscription->getUnsubscribeToken()->getValue();
 
         $response = $this->getJson($this->unsubscribeUrl($cancellationToken));
 
@@ -287,57 +294,46 @@ class WeatherApiTest extends TestCase
      */
     private function getPendingSubscription(array $payload)
     {
-        return $this->repository->getPendingSubscription(
+        $id = $this->repository->getPendingSubscriptionId(
             new Subscription(
                 email: new Email($payload['email']),
                 city: new City($payload['city']),
                 frequency: Frequency::fromName($payload['frequency'])
             )
         );
+
+        return $this->getSubscription($id);
     }
 
-    private function getTokenFromSubscription($subscription, string $type): string
+    private function getSubscription(int $id): Subscription
     {
-        $token = $subscription->tokens
-            ->firstWhere('type', $type)
-            ?->token;
+        $sub = $this->repository->findSubscriptionById($id);
 
-        $this->assertNotNull($token, "Token of type '{$type}' not found");
+        $this->assertNotNull($sub, "Subscription with id {$id} not found");
 
-        return $token;
+        return $sub;
     }
 
     /**
      * @throws ValidationException
      */
-    private function createAndConfirmSubscription(array $payload)
+    private function createAndConfirmSubscription(array $payload): Subscription
     {
         $this->postJson($this->subscribeUrl(), $payload)->assertOk();
 
         $subscription = $this->getPendingSubscription($payload);
-        $confirmationToken = $this->getTokenFromSubscription($subscription, 'confirm');
+        $confirmationToken = $subscription->getConfirmationToken()->getValue();
 
         $this->getJson($this->confirmUrl($confirmationToken))->assertOk();
 
-        return $subscription;
+        return $this->getSubscription($subscription->getId());
     }
 
-    private function expireConfirmationToken($subscription): void
+    private function assertNewTokenCreated(Subscription $subscription): void
     {
-        $tokenModel = $subscription->tokens->firstWhere('type', 'confirm');
-        $tokenModel->update(['expires_at' => now()->subHour()]);
-    }
+        $hasNewToken = $this->repository->hasValidConfirmationToken($subscription->getId());
 
-    private function assertNewTokenCreated($subscription): void
-    {
-        $subscription->refresh();
-        $newToken = $subscription->tokens()
-            ->where('type', 'confirm')
-            ->where('expires_at', '>', now())
-            ->latest()
-            ->first();
-
-        $this->assertNotNull($newToken, 'New confirmation token was not created');
+        $this->assertNotNull($hasNewToken, 'New confirmation token was not created');
     }
 
     // URL BUILDERS
@@ -363,12 +359,6 @@ class WeatherApiTest extends TestCase
     }
 
     // ASSERTION HELPERS
-
-    private function assertSuccessResponse($response): void
-    {
-        $response->assertOk()
-            ->assertJsonFragment(['success' => true]);
-    }
 
     private function assertErrorMessage($response, string $messageKey, int $statusCode = 404): void
     {
