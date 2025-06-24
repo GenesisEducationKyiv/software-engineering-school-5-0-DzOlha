@@ -16,9 +16,21 @@ jobs:
         run: |
           mkdir -p infra/test/php
           touch infra/test/php/.env
+          
+          # Set or replace WEATHER_API_KEY
           grep -q '^WEATHER_API_KEY=' infra/test/php/.env && \
             sed -i "s/^WEATHER_API_KEY=.*/WEATHER_API_KEY=${{ secrets.WEATHER_API_KEY }}/" infra/test/php/.env || \
             echo "WEATHER_API_KEY=${{ secrets.WEATHER_API_KEY }}" >> infra/test/php/.env
+
+          # Set or replace OPEN_WEATHER_API_KEY
+          grep -q '^OPEN_WEATHER_API_KEY=' infra/test/php/.env && \
+            sed -i "s/^OPEN_WEATHER_API_KEY=.*/OPEN_WEATHER_API_KEY=${{ secrets.OPEN_WEATHER_API_KEY }}/" infra/test/php/.env || \
+            echo "OPEN_WEATHER_API_KEY=${{ secrets.OPEN_WEATHER_API_KEY }}" >> infra/test/php/.env
+
+          # Set or replace WEATHER_STACK_API_KEY
+          grep -q '^WEATHER_STACK_API_KEY=' infra/test/php/.env && \
+            sed -i "s/^WEATHER_STACK_API_KEY=.*/WEATHER_STACK_API_KEY=${{ secrets.WEATHER_STACK_API_KEY }}/" infra/test/php/.env || \
+            echo "WEATHER_STACK_API_KEY=${{ secrets.WEATHER_STACK_API_KEY }}" >> infra/test/php/.env
 
       - name: Build and run integration tests
         run: |
