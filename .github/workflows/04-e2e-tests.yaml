@@ -31,7 +31,10 @@ jobs:
             sed -i "s/^WEATHER_STACK_API_KEY=.*/WEATHER_STACK_API_KEY=${{ secrets.WEATHER_STACK_API_KEY }}/" infra/test/php/.env || \
             echo "WEATHER_STACK_API_KEY=${{ secrets.WEATHER_STACK_API_KEY }}" >> infra/test/php/.env
 
-      - name: Build and run e2e tests
+      - name: Build all images
+        run: docker compose -f infra/test/docker-compose.yaml build e2e-runner nginx php postgres redis mailpit queue-runner
+
+      - name: Run e2e tests
         run: |
-          docker compose -f infra/test/docker-compose.yaml up --build --abort-on-container-exit --remove-orphans e2e-runner
-          docker compose -f infra/test/docker-compose.yaml down
+          docker compose -f infra/test/docker-compose.yaml up --abort-on-container-exit --remove-orphans e2e-runner
+          docker compose -f infra/test/docker-compose.yaml down --volumes --remove-orphans
