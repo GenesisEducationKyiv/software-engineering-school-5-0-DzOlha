@@ -2,28 +2,18 @@
 
 namespace App\Infrastructure\Weather\Repositories;
 
-use App\Domain\Weather\Repositories\WeatherRepositoryInterface;
 use App\Domain\Weather\ValueObjects\City\City;
 use App\Domain\Weather\ValueObjects\WeatherData;
 use App\Exceptions\Custom\ApiAccessException;
 use App\Exceptions\Custom\CityNotFoundException;
-use Illuminate\Support\Facades\Http;
 
-class WeatherApiRepository implements WeatherRepositoryInterface
+class WeatherApiRepository extends AbstractWeatherRepository
 {
-    private string $apiKey;
-    private string $apiUrl;
+    protected int $cityNotFoundCode = 1006;
 
-    private int $cityNotFoundCode = 1006;
-
-    public function __construct(
-        private readonly string $currentWeatherEndpoint = '/current.json'
-    ) {
-        $key = config('services.weather.api_key');
-        $url = config('services.weather.api_url');
-
-        $this->apiKey = is_string($key) ? $key : "";
-        $this->apiUrl = is_string($url) ? $url : "";
+    public function getProviderName(): string
+    {
+        return "WeatherApi";
     }
 
     /**
@@ -35,35 +25,31 @@ class WeatherApiRepository implements WeatherRepositoryInterface
      */
     public function getCurrentWeather(City $city): WeatherData
     {
-        try {
-            $response = Http::get($this->apiUrl . $this->currentWeatherEndpoint, [
-                'key' => $this->apiKey,
-                'q'   => $city->getName()
-            ]);
+        $response = $this->httpClient->get($this->apiUrl . $this->currentWeatherEndpoint, [
+            'key' => $this->apiKey,
+            'q'   => $city->getName()
+        ]);
 
-            if ($response->successful()) {
-                /**
-                 * @var array{current:array{temp_c: float, humidity: float, condition: array{text: string}}} $data
-                 */
-                $data = $response->json();
+        if ($response->successful()) {
+            /**
+             * @var array{current:array{temp_c: float, humidity: float, condition: array{text: string}}} $data
+             */
+            $data = $response->json();
 
-                return new WeatherData(
-                    temperature: $data['current']['temp_c'],
-                    humidity: $data['current']['humidity'],
-                    description: $data['current']['condition']['text'],
-                );
-            } else {
-                /**
-                 * @var array{error:array{code: int}} $data
-                 */
-                $data = $response->json();
-                if ($data['error']['code'] === $this->cityNotFoundCode) {
-                    throw new CityNotFoundException();
-                }
-                throw new ApiAccessException();
+            return new WeatherData(
+                temperature: $data['current']['temp_c'],
+                humidity: $data['current']['humidity'],
+                description: $data['current']['condition']['text'],
+            );
+        } else {
+            /**
+             * @var array{error:array{code: int}} $data
+             */
+            $data = $response->json();
+            if ($this->hasNotFoundError($data['error'])) {
+                throw new CityNotFoundException();
             }
-        } catch (\Exception $e) {
-            throw $e;
+            throw new ApiAccessException();
         }
     }
 
@@ -72,27 +58,23 @@ class WeatherApiRepository implements WeatherRepositoryInterface
      */
     public function cityExists(City $city): bool
     {
-        try {
-            $response = Http::get($this->apiUrl . $this->currentWeatherEndpoint, [
-                'key' => $this->apiKey,
-                'q'   => $city->getName()
-            ]);
+        $response = $this->httpClient->get($this->apiUrl . $this->currentWeatherEndpoint, [
+            'key' => $this->apiKey,
+            'q'   => $city->getName()
+        ]);
 
-            if ($response->successful()) {
-                return true;
-            } else {
-                /**
-                 * @var array{error:array{code: int}} $data
-                 */
-                $data = $response->json();
+        if ($response->successful()) {
+            return true;
+        } else {
+            /**
+             * @var array{error:array{code: int}} $data
+             */
+            $data = $response->json();
 
-                if ($data['error']['code'] === $this->cityNotFoundCode) {
-                    return false;
-                }
-                throw new ApiAccessException();
+            if ($this->hasNotFoundError($data['error'])) {
+                return false;
             }
-        } catch (\Exception $e) {
-            throw $e;
+            throw new ApiAccessException();
         }
     }
 }

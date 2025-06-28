@@ -19,6 +19,8 @@ class WeatherApiTest extends TestCase
 
     private SubscriptionRepositoryInterface $repository;
 
+    private const INVALID_CITY_NAME = "AAAA";
+
     // ERROR MESSAGE CONSTANTS
     private const ERROR_MESSAGES = [
         'city_not_found'           => 'City not found',
@@ -62,7 +64,8 @@ class WeatherApiTest extends TestCase
 
     public function test_get_current_weather_city_not_found(): void
     {
-        $response = $this->getJson($this->weatherUrl('?city=invalid_city_name'));
+        $city = self::INVALID_CITY_NAME;
+        $response = $this->getJson($this->weatherUrl("?city={$city}"));
 
         $this->assertErrorMessage($response, 'city_not_found');
     }
@@ -153,7 +156,7 @@ class WeatherApiTest extends TestCase
     public function test_subscribe_city_not_found(): void
     {
         $payload = $this->getValidSubscriptionPayload();
-        $payload['city'] = 'invalid_city_name';
+        $payload['city'] = self::INVALID_CITY_NAME;
 
         $response = $this->postJson($this->subscribeUrl(), $payload);
 

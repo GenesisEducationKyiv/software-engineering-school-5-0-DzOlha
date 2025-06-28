@@ -36,7 +36,20 @@ return [
     ],
 
     'weather' => [
-        'api_key' => env('WEATHER_API_KEY'),
-        'api_url' => env('WEATHER_API_URL', 'https://api.weatherapi.com/v1')
+        'WeatherApi' => [ //Requires key, q params
+            'api_key' => env('WEATHER_API_KEY'),
+            'api_url' => 'https://api.weatherapi.com/v1',
+            'api_endpoint' => '/current.json'
+        ],
+        'OpenWeather' => [ //Requires appid, q params
+            'api_key' => env('OPEN_WEATHER_API_KEY'),
+            'api_url' => 'https://api.openweathermap.org/data/2.5',
+            'api_endpoint' => '/weather', // OpenWeather uses this for current weather
+        ],
+        'WeatherStack' => [//Requires access_key, query params
+            'api_key' => env('WEATHER_STACK_API_KEY'),
+            'api_url' => 'https://api.weatherstack.com',
+            'api_endpoint' => '/current', // WeatherStack uses /current
+        ]
     ]
 ];

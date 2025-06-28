@@ -16,11 +16,26 @@ jobs:
         run: |
           mkdir -p infra/test/php
           touch infra/test/php/.env
+          
+          # Set or replace WEATHER_API_KEY
           grep -q '^WEATHER_API_KEY=' infra/test/php/.env && \
             sed -i "s/^WEATHER_API_KEY=.*/WEATHER_API_KEY=${{ secrets.WEATHER_API_KEY }}/" infra/test/php/.env || \
             echo "WEATHER_API_KEY=${{ secrets.WEATHER_API_KEY }}" >> infra/test/php/.env
 
-      - name: Build and run integration tests
+          # Set or replace OPEN_WEATHER_API_KEY
+          grep -q '^OPEN_WEATHER_API_KEY=' infra/test/php/.env && \
+            sed -i "s/^OPEN_WEATHER_API_KEY=.*/OPEN_WEATHER_API_KEY=${{ secrets.OPEN_WEATHER_API_KEY }}/" infra/test/php/.env || \
+            echo "OPEN_WEATHER_API_KEY=${{ secrets.OPEN_WEATHER_API_KEY }}" >> infra/test/php/.env
+
+          # Set or replace WEATHER_STACK_API_KEY
+          grep -q '^WEATHER_STACK_API_KEY=' infra/test/php/.env && \
+            sed -i "s/^WEATHER_STACK_API_KEY=.*/WEATHER_STACK_API_KEY=${{ secrets.WEATHER_STACK_API_KEY }}/" infra/test/php/.env || \
+            echo "WEATHER_STACK_API_KEY=${{ secrets.WEATHER_STACK_API_KEY }}" >> infra/test/php/.env
+
+      - name: Build all images
+        run: docker compose -f infra/test/docker-compose.yaml build integration-runner postgres redis mailpit queue-runner
+
+      - name: Run integration tests
         run: |
-          docker compose -f infra/test/docker-compose.yaml up --build --abort-on-container-exit --remove-orphans integration-runner
-          docker compose -f infra/test/docker-compose.yaml down
+          docker compose -f infra/test/docker-compose.yaml up --abort-on-container-exit --remove-orphans integration-runner
+          docker compose -f infra/test/docker-compose.yaml down --volumes --remove-orphans

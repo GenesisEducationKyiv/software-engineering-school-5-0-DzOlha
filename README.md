@@ -19,7 +19,7 @@ All media files can be found in the `/media` folder located in the root director
       cp infra/dev/postgres/.env.example infra/dev/postgres/.env
       ```
 
-2. **Customize database settings(optional) and API key**:
+2. **Customize database settings(optional) and API keys**:
 
    In `infra/dev/postgres/.env`:
    ```env
@@ -35,6 +35,8 @@ All media files can be found in the `/media` folder located in the root director
    DB_PASSWORD=your_password
    
    WEATHER_API_KEY=weather_api_key_is_here
+   OPEN_WEATHER_API_KEY=open_weather_key_is_here
+   WEATHER_STACK_API_KEY=weather_stack_key_is_here
    ```
 
 3. **Run the application**:
@@ -56,7 +58,7 @@ All media files can be found in the `/media` folder located in the root director
       cp infra/prod/postgres/.env.example infra/prod/postgres/.env
       ```
 
-2. **Customize database settings(optional) and API key**:
+2. **Customize database settings(optional) and API keys**:
 
    In `infra/prod/postgres/.env`:
    ```env
@@ -72,6 +74,8 @@ All media files can be found in the `/media` folder located in the root director
    DB_PASSWORD=your_password
    
    WEATHER_API_KEY=weather_api_key_is_here
+   OPEN_WEATHER_API_KEY=open_weather_key_is_here
+   WEATHER_STACK_API_KEY=weather_stack_key_is_here
    ```
 
 3. **Run the application in production-like mode** (no bind mounts for real-time code updates, so **working faster**):
@@ -136,6 +140,6 @@ The application uses Mailpit for email testing:
 ## Weather API Integration
 
 To use the Weather API functionality:
-1. Create an account at [WeatherAPI](https://www.weatherapi.com/my)
-2. Obtain your API token
-3. Add the token to the appropriate `/infra/dev/php/.env` and `/infra/prod/php/.env`files as described at the beginning of this README
+1. Create accounts at [WeatherAPI](https://www.weatherapi.com/my), [OpenWeatherMap](https://openweathermap.org/), and [WeatherStack](https://weatherstack.com/)
+2. Obtain your API tokens
+3. Add the tokens to the appropriate `/infra/dev/php/.env` and `/infra/prod/php/.env`files as described at the beginning of this README
