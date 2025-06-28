@@ -11,7 +11,6 @@ use App\Infrastructure\Weather\Repositories\Chain\WeatherChain;
 use App\Infrastructure\Weather\Repositories\OpenWeatherRepository;
 use App\Infrastructure\Weather\Repositories\WeatherApiRepository;
 use App\Infrastructure\Weather\Repositories\WeatherStackRepository;
-use Illuminate\Contracts\Container\BindingResolutionException;
 
 class WeatherChainBuilder implements WeatherChainBuilderInterface
 {

@@ -64,8 +64,6 @@ services:
   # Mail service
   mailpit:
     image: axllent/mailpit
-    ports:
-      - "1025:1025"  # SMTP
 
   # Queue worker for Laravel jobs
   queue-runner:
