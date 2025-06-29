@@ -20,6 +20,7 @@ use App\Domain\Subscription\Repositories\SubscriptionRepositoryInterface;
 use App\Domain\Subscription\ValueObjects\Token\Factory\TokenFactory;
 use App\Domain\Subscription\ValueObjects\Token\Factory\TokenFactoryInterface;
 use App\Domain\Subscription\ValueObjects\Token\Generator\TokenGeneratorInterface;
+use App\Domain\Weather\Repositories\Cache\Monitor\WeatherCacheMonitorInterface;
 use App\Domain\Weather\Repositories\Chain\Builder\WeatherChainBuilderInterface;
 use App\Domain\Weather\Repositories\WeatherRepositoryInterface;
 use App\Infrastructure\Subscription\Emails\Mailers\LaravelMailer;
@@ -28,10 +29,16 @@ use App\Infrastructure\Subscription\Token\Generator\TokenGenerator;
 use App\Infrastructure\Subscription\Utils\Builders\SubscriptionLinkBuilder;
 use App\Infrastructure\Weather\HttpClient\HttpClient;
 use App\Infrastructure\Weather\HttpClient\Logger\FileHttpLogger;
+use App\Infrastructure\Weather\Repositories\Cache\Monitor\PrometheusWeatherCacheMonitor;
+use App\Infrastructure\Weather\Repositories\Cache\WeatherRepositoryCache;
 use App\Infrastructure\Weather\Repositories\Chain\Builder\WeatherChainBuilder;
+use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
+use Prometheus\CollectorRegistry;
+use Prometheus\Storage\Adapter;
+use Prometheus\Storage\Redis;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -52,8 +59,40 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->singleton(WeatherChainBuilderInterface::class, WeatherChainBuilder::class);
 
+        $this->app->bind(Adapter::class, function () {
+            return new Redis([
+                'host' => config('cache.stores.redis.host'),
+                'port' => config('cache.stores.redis.port')
+            ]);
+        });
+
+        $this->app->singleton(CollectorRegistry::class, function (Application $app) {
+            /**
+             * @var Adapter $adapter
+             */
+            $adapter = $app->make(Adapter::class);
+            return new CollectorRegistry($adapter);
+        });
+
+        $this->app->singleton(WeatherCacheMonitorInterface::class, PrometheusWeatherCacheMonitor::class);
+
         $this->app->singleton(WeatherRepositoryInterface::class, function (Application $app) {
-            return $app->make(WeatherChainBuilderInterface::class)->build();
+            $apiRepository = $app->make(WeatherChainBuilderInterface::class)->build();
+            /**
+             * @var WeatherCacheMonitorInterface $prometheusMonitor
+             */
+            $prometheusMonitor = $app->make(WeatherCacheMonitorInterface::class);
+
+            /**
+             * @var Repository $cacheContract
+             */
+            $cacheContract = $app->make(Repository::class);
+
+            return new WeatherRepositoryCache(
+                $apiRepository,
+                $prometheusMonitor,
+                $cacheContract
+            );
         });
 
         $this->app->singleton(WeatherServiceInterface::class, WeatherService::class);
