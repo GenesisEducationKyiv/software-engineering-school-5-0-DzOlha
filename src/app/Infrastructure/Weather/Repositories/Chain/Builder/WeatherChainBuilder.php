@@ -18,22 +18,22 @@ class WeatherChainBuilder implements WeatherChainBuilderInterface
     {
         $httpClient = app(HttpClientInterface::class);
 
-        $provider1 = new WeatherChainHandler(
+        $weatherApiProvider = new WeatherChainHandler(
             new WeatherApiRepository($httpClient)
         );
 
-        $provider2 = new WeatherChainHandler(
+        $openWeatherProvider = new WeatherChainHandler(
             new OpenWeatherRepository($httpClient)
         );
 
-        $provider3 = new WeatherChainHandler(
+        $weatherStackProvider = new WeatherChainHandler(
             new WeatherStackRepository($httpClient)
         );
 
-        $provider1->setNext($provider2);
-        $provider2->setNext($provider3);
+        $weatherApiProvider->setNext($openWeatherProvider);
+        $openWeatherProvider->setNext($weatherStackProvider);
 
-        return $provider1;
+        return $weatherApiProvider;
     }
 
     public function build(): WeatherRepositoryInterface
