@@ -2,17 +2,17 @@
 
 namespace App\Application\Subscription\Emails\Services;
 
+use App\Application\Subscription\Emails\EmailServiceInterface;
+use App\Application\Subscription\Emails\Mailers\MailerInterface;
 use App\Application\Subscription\Emails\Mails\Confirmation\ConfirmationMail;
 use App\Application\Subscription\Emails\Mails\Confirmation\ConfirmationMailData;
 use App\Application\Subscription\Emails\Mails\Update\WeatherUpdateMail;
 use App\Application\Subscription\Emails\Mails\Update\WeatherUpdateMailData;
-use App\Application\Subscription\Emails\EmailServiceInterface;
-use App\Application\Subscription\Emails\Mailers\MailerInterface;
 use App\Application\Subscription\Utils\Builders\SubscriptionLinkBuilderInterface;
+use App\Application\Subscription\Utils\Links\Impl\extend\ConfirmationLink;
+use App\Application\Subscription\Utils\Links\Impl\extend\UnsubscribeLink;
 use App\Domain\Subscription\Entities\Subscription;
 use App\Domain\Weather\ValueObjects\WeatherData;
-use App\Infrastructure\Subscription\Utils\Links\extend\ConfirmationLink;
-use App\Infrastructure\Subscription\Utils\Links\extend\UnsubscribeLink;
 
 class EmailService implements EmailServiceInterface
 {

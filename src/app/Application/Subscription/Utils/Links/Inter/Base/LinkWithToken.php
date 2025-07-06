@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Application\Subscription\Utils\Links\Base;
+namespace App\Application\Subscription\Utils\Links\Inter\Base;
 
 interface LinkWithToken
 {

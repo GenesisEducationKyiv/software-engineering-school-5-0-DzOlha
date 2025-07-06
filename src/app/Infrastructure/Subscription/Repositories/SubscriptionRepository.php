@@ -21,8 +21,6 @@ use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
-use function Laravel\Prompts\table;
-
 class SubscriptionRepository implements SubscriptionRepositoryInterface
 {
     /**

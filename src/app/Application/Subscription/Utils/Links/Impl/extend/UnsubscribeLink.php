@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Infrastructure\Subscription\Utils\Links\extend;
+namespace App\Application\Subscription\Utils\Links\Impl\extend;
 
-use App\Infrastructure\Subscription\Utils\Links\AbstractSubscriptionLink;
+use App\Application\Subscription\Utils\Links\Impl\AbstractSubscriptionLink;
 
 class UnsubscribeLink extends AbstractSubscriptionLink
 {

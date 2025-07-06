@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Infrastructure\Subscription\Utils\Links;
+namespace App\Application\Subscription\Utils\Links\Impl;
 
-use App\Application\Subscription\Utils\Links\SubscriptionLinkInterface;
+use App\Application\Subscription\Utils\Links\Inter\SubscriptionLinkInterface;
 use App\Domain\Subscription\Entities\Subscription;
 
 abstract class AbstractSubscriptionLink implements SubscriptionLinkInterface
