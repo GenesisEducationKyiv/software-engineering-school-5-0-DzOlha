@@ -1,0 +1,30 @@
+parameters:
+  paths:
+    - ./app
+  layers:
+    - name: Presentation
+      collectors:
+        - type: directory
+          value: "app/Presentation"
+    - name: Application
+      collectors:
+        - type: directory
+          value: "app/Application"
+    - name: Domain
+      collectors:
+        - type: directory
+          value: "app/Domain"
+    - name: Infrastructure
+      collectors:
+        - type: directory
+          value: "app/Infrastructure"
+  ruleset:
+    Presentation:
+      - Application
+      - Domain
+    Application:
+      - Domain
+    Domain: ~
+    Infrastructure:
+      - Application
+      - Domain

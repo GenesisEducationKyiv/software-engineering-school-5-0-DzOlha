@@ -4,3 +4,4 @@
 /infra/prod/php/.env
 .idea/
 /src/.phpcs-cache
+/src/.deptrac.cache

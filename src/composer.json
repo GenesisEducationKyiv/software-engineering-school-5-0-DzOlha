@@ -13,6 +13,7 @@
         "promphp/prometheus_client_php": "^2.14"
     },
     "require-dev": {
+        "deptrac/deptrac": "^3.0",
         "fakerphp/faker": "^1.23",
         "larastan/larastan": "^3.4",
         "laravel/pail": "^1.1",
@@ -64,7 +65,8 @@
             "@lint",
             "@analyse"
         ],
-        "fix": "@lint:fix"
+        "fix": "@lint:fix",
+        "check:architecture": "vendor/bin/deptrac analyse --config-file=deptrac.yaml"
     },
     "extra": {
         "laravel": {
