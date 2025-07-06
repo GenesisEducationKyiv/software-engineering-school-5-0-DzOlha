@@ -70,7 +70,7 @@
 
 ## 3. High-Level Architecture
 
-![High-Level-Architecture](./diagrams/High-Level-Architecture.png)
+![Updated-High-Level-Architecture](./diagrams/architecture/Updated-High-Level-Architecture.png)
 
 - Web client interacts with the PHP backend API
 - API uses Redis for caching and job queue
@@ -85,7 +85,7 @@
 ### 4.1 Database Design
 
 <div style="display: flex; align-items: flex-start; gap: 20px;">
-  <img src="./diagrams/Entity-Relationship-Model.png" alt="ER Model" style="max-width: 600px;">
+  <img src="./diagrams/database/Entity-Relationship-Model.png" alt="ER Model" style="max-width: 600px;">
   <div>
   </div>
 </div>
