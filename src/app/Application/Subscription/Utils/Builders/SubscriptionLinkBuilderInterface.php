@@ -2,7 +2,7 @@
 
 namespace App\Application\Subscription\Utils\Builders;
 
-use App\Application\Subscription\Utils\Links\SubscriptionLinkInterface;
+use App\Application\Subscription\Utils\Links\Inter\SubscriptionLinkInterface;
 
 interface SubscriptionLinkBuilderInterface
 {

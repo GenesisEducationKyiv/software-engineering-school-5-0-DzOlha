@@ -3,7 +3,7 @@
 namespace App\Infrastructure\Subscription\Utils\Builders;
 
 use App\Application\Subscription\Utils\Builders\SubscriptionLinkBuilderInterface;
-use App\Application\Subscription\Utils\Links\SubscriptionLinkInterface;
+use App\Application\Subscription\Utils\Links\Inter\SubscriptionLinkInterface;
 use Illuminate\Support\Facades\URL;
 
 class SubscriptionLinkBuilder implements SubscriptionLinkBuilderInterface

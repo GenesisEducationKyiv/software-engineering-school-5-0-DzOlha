@@ -1,4 +1,4 @@
-name: Code Quality
+name: Test Architecture (n-layer - DDD)
 
 on:
   push:
@@ -23,8 +23,5 @@ jobs:
       - name: Install dependencies
         run: docker compose run --rm composer install --no-interaction --prefer-dist --optimize-autoloader
 
-      - name: Run code style check (PHPCS)
-        run: docker compose run --rm composer lint
-
-      - name: Run static analysis (PHPStan)
-        run: docker compose run --rm composer analyse
+      - name: Run architecture check (PHPCS)
+        run: docker compose run --rm composer check:architecture
