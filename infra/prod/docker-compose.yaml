@@ -70,6 +70,30 @@ services:
     ports:
       - "5540:5540"
 
+  prometheus:
+    image: prom/prometheus:v3.4.2
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    depends_on:
+      - nginx
+
+  grafana:
+    build:
+      context: ../../
+      dockerfile: infra/dev/grafana/Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+    env_file:
+      - ./grafana/.env
+    depends_on:
+      - prometheus
+
 volumes:
   pgdata:
   redisdata:
+  grafana-data:

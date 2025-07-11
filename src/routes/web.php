@@ -1,5 +1,6 @@
 <?php
 
+use App\Presentation\Api\Controllers\MetricsController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -15,6 +16,8 @@ Route::get('/unsubscribe', function () {
     $token = request()->query('token');
     return view('pages.unsubscribe', ['token' => $token]);
 });
+
+Route::get('/metrics', [MetricsController::class, 'metrics']);
 
 Route::fallback(function () {
     return response()->view('pages.404', [], 404);
