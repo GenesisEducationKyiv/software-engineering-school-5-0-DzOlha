@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Application\Subscription\Utils\Links\Impl\extend;
+namespace App\Modules\Email\Application\Utils\Links\Implementation\Concrete;
 
-use App\Application\Subscription\Utils\Links\Impl\AbstractSubscriptionLink;
+use App\Modules\Email\Application\Utils\Links\Implementation\AbstractSubscriptionLink;
 
 class UnsubscribeLink extends AbstractSubscriptionLink
 {
     public function getToken(): ?string
     {
-        return $this->subscription->getUnsubscribeToken()?->getValue();
+        return $this->subscription->getUnsubscribeToken();
     }
 
     public function getEndpoint(): string

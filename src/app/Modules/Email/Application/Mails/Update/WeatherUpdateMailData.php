@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Application\Subscription\Emails\Mails\Update;
+namespace App\Modules\Email\Application\Mails\Update;
 
-use App\Domain\Weather\ValueObjects\WeatherData;
+use App\Modules\Email\Domain\Entities\EmailWeatherEntity;
 
 readonly class WeatherUpdateMailData
 {
@@ -16,7 +16,7 @@ readonly class WeatherUpdateMailData
     public function __construct(
         string $city,
         string $frequency,
-        WeatherData $weatherData,
+        EmailWeatherEntity $weatherData,
         string $unsubscribeUrl
     ) {
         $this->city = $city;

@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Infrastructure\Subscription\Utils\Builders;
+namespace App\Modules\Email\Infrastructure\Utils\Builders;
 
-use App\Application\Subscription\Utils\Builders\SubscriptionLinkBuilderInterface;
-use App\Application\Subscription\Utils\Links\Inter\SubscriptionLinkInterface;
+use App\Modules\Email\Application\Utils\Builders\SubscriptionLinkBuilderInterface;
+use App\Modules\Email\Application\Utils\Links\Interface\SubscriptionLinkInterface;
 use Illuminate\Support\Facades\URL;
 
 class SubscriptionLinkBuilder implements SubscriptionLinkBuilderInterface

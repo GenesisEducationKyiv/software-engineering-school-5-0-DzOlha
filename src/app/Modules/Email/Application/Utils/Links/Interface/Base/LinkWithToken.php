@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Application\Subscription\Utils\Links\Inter\Base;
+namespace App\Modules\Email\Application\Utils\Links\Interface\Base;
 
 interface LinkWithToken
 {

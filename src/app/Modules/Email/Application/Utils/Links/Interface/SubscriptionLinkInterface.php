@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Application\Subscription\Utils\Links\Inter;
+namespace App\Modules\Email\Application\Utils\Links\Interface;
 
-use App\Application\Subscription\Utils\Links\Inter\Base\LinkWithEndpoint;
-use App\Application\Subscription\Utils\Links\Inter\Base\LinkWithToken;
+use App\Modules\Email\Application\Utils\Links\Interface\Base\LinkWithEndpoint;
+use App\Modules\Email\Application\Utils\Links\Interface\Base\LinkWithToken;
 
 interface SubscriptionLinkInterface extends LinkWithToken, LinkWithEndpoint
 {

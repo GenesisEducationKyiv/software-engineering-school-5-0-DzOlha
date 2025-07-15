@@ -1,12 +1,18 @@
 <?php
 
-namespace App\Application\Subscription\Emails;
+namespace App\Modules\Email\Application;
 
-use App\Domain\Subscription\Entities\Subscription;
-use App\Domain\Weather\ValueObjects\WeatherData;
+use App\Modules\Email\Domain\Entities\EmailSubscriptionEntity;
+use App\Modules\Email\Domain\Entities\EmailWeatherEntity;
 
 interface EmailServiceInterface
 {
-    public function sendConfirmationEmail(Subscription $subscription): bool;
-    public function sendWeatherUpdate(Subscription $subscription, WeatherData $weatherData): bool;
+    public function sendConfirmationEmail(
+        EmailSubscriptionEntity $subscription
+    ): bool;
+
+    public function sendWeatherUpdate(
+        EmailSubscriptionEntity $subscription,
+        EmailWeatherEntity $weatherData
+    ): bool;
 }

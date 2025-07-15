@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Application\Subscription\Emails\Mails\Confirmation;
+namespace App\Modules\Email\Application\Mails\Confirmation;
 
 use Illuminate\Mail\Mailable;
 

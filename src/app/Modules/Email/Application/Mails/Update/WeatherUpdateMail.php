@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Application\Subscription\Emails\Mails\Update;
+namespace App\Modules\Email\Application\Mails\Update;
 
 use Illuminate\Mail\Mailable;
 

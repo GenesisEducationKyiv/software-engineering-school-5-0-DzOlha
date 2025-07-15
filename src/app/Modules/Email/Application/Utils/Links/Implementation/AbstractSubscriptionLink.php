@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Application\Subscription\Utils\Links\Impl;
+namespace App\Modules\Email\Application\Utils\Links\Implementation;
 
-use App\Application\Subscription\Utils\Links\Inter\SubscriptionLinkInterface;
-use App\Domain\Subscription\Entities\Subscription;
+use App\Modules\Email\Application\Utils\Links\Interface\SubscriptionLinkInterface;
+use App\Modules\Email\Domain\Entities\EmailSubscriptionEntity;
 
 abstract class AbstractSubscriptionLink implements SubscriptionLinkInterface
 {
     public function __construct(
-        protected readonly Subscription $subscription,
+        protected readonly EmailSubscriptionEntity $subscription,
     ) {
     }
 

@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Application\Subscription\Emails\Mails\Confirmation;
+namespace App\Modules\Email\Application\Mails\Confirmation;
 
-use App\Domain\Subscription\Entities\Subscription;
+use App\Modules\Email\Domain\Entities\EmailSubscriptionEntity;
 
 readonly class ConfirmationMailData
 {
@@ -13,12 +13,12 @@ readonly class ConfirmationMailData
 
     public function __construct(
         string $confirmUrl,
-        Subscription $subscription
+        EmailSubscriptionEntity $subscription
     ) {
         $this->confirmUrl = $confirmUrl;
-        $this->frequency = $subscription->getFrequency()->getName();
-        $this->city = $subscription->getCity()->getName();
-        $this->email = $subscription->getEmail()->getValue();
+        $this->frequency = $subscription->getFrequency();
+        $this->city = $subscription->getCity();
+        $this->email = $subscription->getEmail();
     }
 
     public function getConfirmUrl(): string

@@ -1,18 +1,18 @@
 <?php
 
-namespace App\Application\Subscription\Emails\Services;
+namespace App\Modules\Email\Application\Services;
 
-use App\Application\Subscription\Emails\EmailServiceInterface;
-use App\Application\Subscription\Emails\Mailers\MailerInterface;
-use App\Application\Subscription\Emails\Mails\Confirmation\ConfirmationMail;
-use App\Application\Subscription\Emails\Mails\Confirmation\ConfirmationMailData;
-use App\Application\Subscription\Emails\Mails\Update\WeatherUpdateMail;
-use App\Application\Subscription\Emails\Mails\Update\WeatherUpdateMailData;
-use App\Application\Subscription\Utils\Builders\SubscriptionLinkBuilderInterface;
-use App\Application\Subscription\Utils\Links\Impl\extend\ConfirmationLink;
-use App\Application\Subscription\Utils\Links\Impl\extend\UnsubscribeLink;
-use App\Domain\Subscription\Entities\Subscription;
-use App\Domain\Weather\ValueObjects\WeatherData;
+use App\Modules\Email\Application\EmailServiceInterface;
+use App\Modules\Email\Application\Mailers\MailerInterface;
+use App\Modules\Email\Application\Mails\Confirmation\ConfirmationMail;
+use App\Modules\Email\Application\Mails\Confirmation\ConfirmationMailData;
+use App\Modules\Email\Application\Mails\Update\WeatherUpdateMail;
+use App\Modules\Email\Application\Mails\Update\WeatherUpdateMailData;
+use App\Modules\Email\Application\Utils\Builders\SubscriptionLinkBuilderInterface;
+use App\Modules\Email\Application\Utils\Links\Implementation\Concrete\ConfirmationLink;
+use App\Modules\Email\Application\Utils\Links\Implementation\Concrete\UnsubscribeLink;
+use App\Modules\Email\Domain\Entities\EmailSubscriptionEntity;
+use App\Modules\Email\Domain\Entities\EmailWeatherEntity;
 
 class EmailService implements EmailServiceInterface
 {
@@ -22,9 +22,9 @@ class EmailService implements EmailServiceInterface
     ) {
     }
 
-    public function sendConfirmationEmail(Subscription $subscription): bool
+    public function sendConfirmationEmail(EmailSubscriptionEntity $subscription): bool
     {
-        $email = $subscription->getEmail()->getValue();
+        $email = $subscription->getEmail();
         $confirmUrl = $this->urlBuilder->build(
             new ConfirmationLink($subscription)
         );
@@ -38,9 +38,11 @@ class EmailService implements EmailServiceInterface
         return $this->mailer->send($email, new ConfirmationMail($mailData));
     }
 
-    public function sendWeatherUpdate(Subscription $subscription, WeatherData $weatherData): bool
-    {
-        $email = $subscription->getEmail()->getValue();
+    public function sendWeatherUpdate(
+        EmailSubscriptionEntity $subscription,
+        EmailWeatherEntity $weatherData
+    ): bool {
+        $email = $subscription->getEmail();
         $unsubscribeUrl = $this->urlBuilder->build(
             new UnsubscribeLink($subscription)
         );
@@ -50,8 +52,8 @@ class EmailService implements EmailServiceInterface
         }
 
         $mailData = new WeatherUpdateMailData(
-            $subscription->getCity()->getName(),
-            $subscription->getFrequency()->getName(),
+            $subscription->getCity(),
+            $subscription->getFrequency(),
             $weatherData,
             $unsubscribeUrl
         );

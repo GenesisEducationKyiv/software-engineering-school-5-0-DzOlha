@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Application\Subscription\Utils\Builders;
+namespace App\Modules\Email\Application\Utils\Builders;
 
-use App\Application\Subscription\Utils\Links\Inter\SubscriptionLinkInterface;
+use App\Modules\Email\Application\Utils\Links\Interface\SubscriptionLinkInterface;
 
 interface SubscriptionLinkBuilderInterface
 {
