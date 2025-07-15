@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Application\Subscription\Commands;
+namespace Tests\Unit\Modules\Subscription\Application\Commands;
 
 use App\Exceptions\Custom\ApiAccessException;
 use App\Exceptions\Custom\CityNotFoundException;

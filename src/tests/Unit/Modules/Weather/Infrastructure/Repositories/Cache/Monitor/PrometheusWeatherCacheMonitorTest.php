@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Infrastructure\Weather\Repositories\Cache\Monitor;
+namespace Tests\Unit\Modules\Weather\Infrastructure\Repositories\Cache\Monitor;
 
 use App\Modules\Weather\Infrastructure\Repositories\Cache\Monitor\PrometheusWeatherCacheMonitor;
 use Mockery;

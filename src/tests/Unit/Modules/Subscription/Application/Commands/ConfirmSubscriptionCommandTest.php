@@ -1,6 +1,6 @@
 <?php
 
-namespace Application\Subscription\Commands;
+namespace Tests\Unit\Modules\Subscription\Application\Commands;
 
 use App\Exceptions\Custom\TokenNotFoundException;
 use App\Modules\Subscription\Application\Commands\ConfirmSubscriptionCommand;

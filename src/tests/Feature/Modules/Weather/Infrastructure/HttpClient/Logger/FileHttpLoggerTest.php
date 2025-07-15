@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Infrastructure\Weather\HttpClient\Logger;
+namespace Tests\Feature\Modules\Weather\Infrastructure\HttpClient\Logger;
 
 use App\Modules\Weather\Infrastructure\HttpClient\Logger\FileHttpLogger;
 use Illuminate\Http\Client\Response;

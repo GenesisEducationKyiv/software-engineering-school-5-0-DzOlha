@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Infrastructure\Weather\Repositories\Chain;
+namespace Tests\Feature\Modules\Weather\Infrastructure\Repositories\Chain;
 
 use App\Exceptions\Custom\ApiAccessException;
 use App\Exceptions\Custom\CityNotFoundException;

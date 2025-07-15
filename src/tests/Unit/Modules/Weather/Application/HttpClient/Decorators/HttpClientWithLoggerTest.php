@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Application\Weather\HttpClient\Decorators;
+namespace Tests\Unit\Modules\Weather\Application\HttpClient\Decorators;
 
 use App\Modules\Weather\Application\HttpClient\Decorators\HttpClientWithLogger;
 use App\Modules\Weather\Application\HttpClient\HttpClientInterface;

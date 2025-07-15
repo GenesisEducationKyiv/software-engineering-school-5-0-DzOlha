@@ -1,9 +1,9 @@
-@php use App\Application\Subscription\Emails\Mails\Confirmation\ConfirmationMailData; @endphp
+@php use App\Modules\Email\Application\Mails\Confirmation\ConfirmationMailData; @endphp
 @php
     /** @var ConfirmationMailData $data */
 @endphp
 
-    <!DOCTYPE html>
+        <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8"/>
