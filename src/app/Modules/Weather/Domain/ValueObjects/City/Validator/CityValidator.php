@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domain\Weather\ValueObjects\City\Validator;
+namespace App\Modules\Weather\Domain\ValueObjects\City\Validator;
 
 use App\Exceptions\ValidationException;
 

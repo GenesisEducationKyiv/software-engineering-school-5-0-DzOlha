@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domain\Weather\Repositories\Cache\Monitor;
+namespace App\Modules\Weather\Domain\Repositories\Cache\Monitor;
 
 interface WeatherCacheMonitorInterface
 {

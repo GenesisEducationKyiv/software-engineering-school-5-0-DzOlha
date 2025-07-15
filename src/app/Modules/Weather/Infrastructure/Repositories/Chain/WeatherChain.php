@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Infrastructure\Weather\Repositories\Chain;
+namespace App\Modules\Weather\Infrastructure\Repositories\Chain;
 
-use App\Domain\Weather\Repositories\Chain\Handler\WeatherChainHandlerInterface;
-use App\Domain\Weather\Repositories\WeatherRepositoryInterface;
-use App\Domain\Weather\ValueObjects\City\City;
-use App\Domain\Weather\ValueObjects\WeatherData;
+use App\Modules\Weather\Domain\Repositories\Chain\Handler\WeatherChainHandlerInterface;
+use App\Modules\Weather\Domain\Repositories\WeatherRepositoryInterface;
+use App\Modules\Weather\Domain\ValueObjects\City\City;
+use App\Modules\Weather\Domain\ValueObjects\WeatherData;
 
 class WeatherChain implements WeatherRepositoryInterface
 {

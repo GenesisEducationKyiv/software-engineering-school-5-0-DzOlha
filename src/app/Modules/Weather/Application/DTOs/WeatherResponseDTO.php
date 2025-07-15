@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Application\Weather\DTOs;
+namespace App\Modules\Weather\Application\DTOs;
 
 class WeatherResponseDTO
 {

@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Infrastructure\Weather\Repositories\Cache\Monitor;
+namespace App\Modules\Weather\Infrastructure\Repositories\Cache\Monitor;
 
-use App\Domain\Weather\Repositories\Cache\Monitor\WeatherCacheMonitorInterface;
+use App\Modules\Weather\Domain\Repositories\Cache\Monitor\WeatherCacheMonitorInterface;
 use Prometheus\CollectorRegistry;
 use Prometheus\Exception\MetricsRegistrationException;
 

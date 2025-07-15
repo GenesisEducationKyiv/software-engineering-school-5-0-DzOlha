@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Application\Weather\Queries;
+namespace App\Modules\Weather\Application\Queries;
 
-use App\Application\Weather\Services\WeatherServiceInterface;
 use App\Exceptions\Custom\ApiAccessException;
 use App\Exceptions\Custom\CityNotFoundException;
 use App\Modules\Weather\Application\DTOs\WeatherRequestDTO;
 use App\Modules\Weather\Application\DTOs\WeatherResponseDTO;
+use App\Modules\Weather\Application\Services\WeatherServiceInterface;
 
 class GetCurrentWeatherQuery
 {

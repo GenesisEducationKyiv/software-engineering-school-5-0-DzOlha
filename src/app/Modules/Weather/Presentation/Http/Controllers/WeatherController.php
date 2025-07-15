@@ -1,14 +1,15 @@
 <?php
 
-namespace App\Presentation\Api\Controllers;
+namespace App\Modules\Weather\Presentation\Http\Controllers;
 
-use App\Application\Weather\Queries\GetCurrentWeatherQuery;
-use App\Domain\Weather\ValueObjects\City\City;
 use App\Exceptions\Custom\ApiAccessException;
 use App\Exceptions\Custom\CityNotFoundException;
 use App\Exceptions\ValidationException;
 use App\Modules\Weather\Application\DTOs\WeatherRequestDTO;
-use App\Presentation\Api\Requests\WeatherRequest;
+use App\Modules\Weather\Application\Queries\GetCurrentWeatherQuery;
+use App\Modules\Weather\Domain\ValueObjects\City\City;
+use App\Modules\Weather\Presentation\Http\Requests\WeatherRequest;
+use App\Presentation\Api\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 
 class WeatherController extends Controller

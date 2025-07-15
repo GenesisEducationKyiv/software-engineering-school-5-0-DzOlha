@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Infrastructure\Weather\HttpClient\Logger;
+namespace App\Modules\Weather\Infrastructure\HttpClient\Logger;
 
-use App\Application\Weather\HttpClient\Logger\HttpLoggerInterface;
+use App\Modules\Weather\Application\HttpClient\Logger\HttpLoggerInterface;
 use Illuminate\Http\Client\Response;
 
 class FileHttpLogger implements HttpLoggerInterface

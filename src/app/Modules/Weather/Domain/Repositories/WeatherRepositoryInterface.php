@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Domain\Weather\Repositories;
+namespace App\Modules\Weather\Domain\Repositories;
 
-use App\Domain\Weather\ValueObjects\City\City;
-use App\Domain\Weather\ValueObjects\WeatherData;
 use App\Exceptions\Custom\ApiAccessException;
 use App\Exceptions\Custom\CityNotFoundException;
+use App\Modules\Weather\Domain\ValueObjects\City\City;
+use App\Modules\Weather\Domain\ValueObjects\WeatherData;
 
 interface WeatherRepositoryInterface
 {

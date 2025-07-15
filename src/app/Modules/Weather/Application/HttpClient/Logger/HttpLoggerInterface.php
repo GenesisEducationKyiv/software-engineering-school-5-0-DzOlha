@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Application\Weather\HttpClient\Logger;
+namespace App\Modules\Weather\Application\HttpClient\Logger;
 
 use Illuminate\Http\Client\Response;
 

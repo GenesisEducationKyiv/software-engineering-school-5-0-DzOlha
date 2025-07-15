@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Presentation\Api\Controllers;
+namespace App\Modules\Weather\Presentation\Http\Controllers;
 
+use Illuminate\Http\Response;
 use Prometheus\CollectorRegistry;
 use Prometheus\RenderTextFormat;
-use  Illuminate\Http\Response;
 
 class MetricsController
 {

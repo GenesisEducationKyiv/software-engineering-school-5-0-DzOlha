@@ -1,16 +1,16 @@
 <?php
 
-namespace App\Infrastructure\Weather\Repositories\Chain\Builder;
+namespace App\Modules\Weather\Infrastructure\Repositories\Chain\Builder;
 
-use App\Domain\Weather\Repositories\Chain\Builder\WeatherChainBuilderInterface;
-use App\Domain\Weather\Repositories\Chain\Handler\WeatherChainHandlerInterface;
-use App\Domain\Weather\Repositories\WeatherRepositoryInterface;
-use App\Infrastructure\Weather\Repositories\Chain\Handler\WeatherChainHandler;
-use App\Infrastructure\Weather\Repositories\Chain\WeatherChain;
-use App\Infrastructure\Weather\Repositories\OpenWeatherRepository;
-use App\Infrastructure\Weather\Repositories\WeatherApiRepository;
-use App\Infrastructure\Weather\Repositories\WeatherStackRepository;
 use App\Modules\Weather\Application\HttpClient\HttpClientInterface;
+use App\Modules\Weather\Domain\Repositories\Chain\Builder\WeatherChainBuilderInterface;
+use App\Modules\Weather\Domain\Repositories\Chain\Handler\WeatherChainHandlerInterface;
+use App\Modules\Weather\Domain\Repositories\WeatherRepositoryInterface;
+use App\Modules\Weather\Infrastructure\Repositories\Chain\Handler\WeatherChainHandler;
+use App\Modules\Weather\Infrastructure\Repositories\Chain\WeatherChain;
+use App\Modules\Weather\Infrastructure\Repositories\OpenWeatherRepository;
+use App\Modules\Weather\Infrastructure\Repositories\WeatherApiRepository;
+use App\Modules\Weather\Infrastructure\Repositories\WeatherStackRepository;
 
 class WeatherChainBuilder implements WeatherChainBuilderInterface
 {

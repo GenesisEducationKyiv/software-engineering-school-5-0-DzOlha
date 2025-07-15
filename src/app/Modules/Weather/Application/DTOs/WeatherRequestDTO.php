@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Application\Weather\DTOs;
+namespace App\Modules\Weather\Application\DTOs;
 
-use App\Domain\Weather\ValueObjects\City\City;
+use App\Modules\Weather\Domain\ValueObjects\City\City;
 
 class WeatherRequestDTO
 {

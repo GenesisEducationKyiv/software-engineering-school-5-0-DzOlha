@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Domain\Weather\Repositories\Chain\Handler;
+namespace App\Modules\Weather\Domain\Repositories\Chain\Handler;
 
-use App\Domain\Weather\Repositories\WeatherRepositoryInterface;
+use App\Modules\Weather\Domain\Repositories\WeatherRepositoryInterface;
 
 interface WeatherChainHandlerInterface extends WeatherRepositoryInterface
 {

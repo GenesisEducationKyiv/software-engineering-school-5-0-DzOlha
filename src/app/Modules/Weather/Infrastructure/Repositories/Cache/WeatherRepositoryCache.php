@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Infrastructure\Weather\Repositories\Cache;
+namespace App\Modules\Weather\Infrastructure\Repositories\Cache;
 
-use App\Domain\Weather\Repositories\Cache\Monitor\WeatherCacheMonitorInterface;
-use App\Domain\Weather\Repositories\WeatherRepositoryInterface;
-use App\Domain\Weather\ValueObjects\City\City;
-use App\Domain\Weather\ValueObjects\WeatherData;
 use App\Exceptions\Custom\ApiAccessException;
 use App\Exceptions\Custom\CityNotFoundException;
+use App\Modules\Weather\Domain\Repositories\Cache\Monitor\WeatherCacheMonitorInterface;
+use App\Modules\Weather\Domain\Repositories\WeatherRepositoryInterface;
+use App\Modules\Weather\Domain\ValueObjects\City\City;
+use App\Modules\Weather\Domain\ValueObjects\WeatherData;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Psr\SimpleCache\InvalidArgumentException;
 

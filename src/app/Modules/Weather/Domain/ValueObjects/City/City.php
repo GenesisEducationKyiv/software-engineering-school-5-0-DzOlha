@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Domain\Weather\ValueObjects\City;
+namespace App\Modules\Weather\Domain\ValueObjects\City;
 
-use App\Domain\Weather\ValueObjects\City\Validator\CityValidator;
-use App\Domain\Weather\ValueObjects\City\Validator\CityValidatorInterface;
 use App\Exceptions\ValidationException;
+use App\Modules\Weather\Domain\ValueObjects\City\Validator\CityValidator;
+use App\Modules\Weather\Domain\ValueObjects\City\Validator\CityValidatorInterface;
 
 class City
 {

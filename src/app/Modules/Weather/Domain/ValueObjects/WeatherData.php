@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domain\Weather\ValueObjects;
+namespace App\Modules\Weather\Domain\ValueObjects;
 
 class WeatherData
 {

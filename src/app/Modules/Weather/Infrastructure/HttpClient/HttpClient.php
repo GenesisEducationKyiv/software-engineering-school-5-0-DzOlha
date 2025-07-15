@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Infrastructure\Weather\HttpClient;
+namespace App\Modules\Weather\Infrastructure\HttpClient;
 
 use App\Modules\Weather\Application\HttpClient\HttpClientInterface;
 use Illuminate\Http\Client\Response;

@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Application\Weather\HttpClient\Decorators;
+namespace App\Modules\Weather\Application\HttpClient\Decorators;
 
-use App\Application\Weather\HttpClient\Logger\HttpLoggerInterface;
 use App\Modules\Weather\Application\HttpClient\HttpClientInterface;
+use App\Modules\Weather\Application\HttpClient\Logger\HttpLoggerInterface;
 use Illuminate\Http\Client\Response;
 
 class HttpClientWithLogger extends AbstractHttpDecorator
