@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Domain\Subscription\Repositories;
+namespace App\Modules\Subscription\Domain\Repositories;
 
-use App\Domain\Subscription\Entities\Subscription;
-use App\Domain\Subscription\ValueObjects\Token\Token;
 use App\Exceptions\Custom\FrequencyNotFoundException;
+use App\Modules\Subscription\Domain\Entities\Subscription;
+use App\Modules\Subscription\Domain\ValueObjects\Token\Token;
 
 interface SubscriptionRepositoryInterface
 {

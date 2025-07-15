@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domain\Subscription\ValueObjects\Token;
+namespace App\Modules\Subscription\Domain\ValueObjects\Token;
 
 use App\Exceptions\ValidationException;
 

@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Domain\Subscription\ValueObjects\Email;
+namespace App\Modules\Subscription\Domain\ValueObjects\Email;
 
-use App\Domain\Subscription\ValueObjects\Email\Validator\EmailValidator;
-use App\Domain\Subscription\ValueObjects\Email\Validator\EmailValidatorInterface;
 use App\Exceptions\ValidationException;
+use App\Modules\Subscription\Domain\ValueObjects\Email\Validator\EmailValidator;
+use App\Modules\Subscription\Domain\ValueObjects\Email\Validator\EmailValidatorInterface;
 
 class Email
 {

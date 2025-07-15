@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domain\Subscription\ValueObjects\Email\Validator;
+namespace App\Modules\Subscription\Domain\ValueObjects\Email\Validator;
 
 use App\Exceptions\ValidationException;
 

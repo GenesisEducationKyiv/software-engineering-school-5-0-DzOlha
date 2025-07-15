@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domain\Subscription\ValueObjects\Token\Generator;
+namespace App\Modules\Subscription\Domain\ValueObjects\Token\Generator;
 
 use Random\RandomException;
 

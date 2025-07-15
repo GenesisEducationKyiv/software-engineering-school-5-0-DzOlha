@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Application\Subscription\Commands;
+namespace App\Modules\Subscription\Application\Commands;
 
-use App\Application\Subscription\DTOs\ConfirmSubscriptionRequestDTO;
-use App\Application\Subscription\Services\SubscriptionServiceInterface;
 use App\Exceptions\Custom\TokenNotFoundException;
+use App\Modules\Subscription\Application\DTOs\ConfirmSubscriptionRequestDTO;
+use App\Modules\Subscription\Application\Services\SubscriptionServiceInterface;
 
 class ConfirmSubscriptionCommand
 {

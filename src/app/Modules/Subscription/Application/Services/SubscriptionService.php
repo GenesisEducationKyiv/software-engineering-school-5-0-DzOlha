@@ -1,30 +1,30 @@
 <?php
 
-namespace App\Application\Subscription\Services;
+namespace App\Modules\Subscription\Application\Services;
 
-use App\Application\Subscription\DTOs\ConfirmSubscriptionRequestDTO;
-use App\Application\Subscription\DTOs\UnsubscribeRequestDTO;
-use App\Domain\Subscription\Entities\Subscription;
-use App\Domain\Subscription\Events\SubscriptionConfirmed;
-use App\Domain\Subscription\Events\SubscriptionCreated;
-use App\Domain\Subscription\Repositories\SubscriptionRepositoryInterface;
-use App\Domain\Subscription\ValueObjects\Email\Email;
-use App\Domain\Subscription\ValueObjects\Frequency\Frequency;
-use App\Domain\Subscription\ValueObjects\Token\Factory\TokenFactoryInterface;
-use App\Domain\Weather\Repositories\WeatherRepositoryInterface;
-use App\Domain\Weather\ValueObjects\City\City;
 use App\Exceptions\Custom\ApiAccessException;
 use App\Exceptions\Custom\CityNotFoundException;
 use App\Exceptions\Custom\EmailAlreadySubscribedException;
 use App\Exceptions\Custom\FrequencyNotFoundException;
 use App\Exceptions\Custom\SubscriptionAlreadyPendingException;
 use App\Exceptions\Custom\TokenNotFoundException;
+use App\Modules\Subscription\Application\DTOs\ConfirmSubscriptionRequestDTO;
+use App\Modules\Subscription\Application\DTOs\UnsubscribeRequestDTO;
+use App\Modules\Subscription\Application\Events\SubscriptionConfirmed;
+use App\Modules\Subscription\Application\Events\SubscriptionCreated;
+use App\Modules\Subscription\Domain\Entities\Subscription;
+use App\Modules\Subscription\Domain\Repositories\SubscriptionRepositoryInterface;
+use App\Modules\Subscription\Domain\ValueObjects\City\City;
+use App\Modules\Subscription\Domain\ValueObjects\Email\Email;
+use App\Modules\Subscription\Domain\ValueObjects\Frequency\Frequency;
+use App\Modules\Subscription\Domain\ValueObjects\Token\Factory\TokenFactoryInterface;
+use App\Modules\Weather\Presentation\Interface\WeatherModuleInterface;
 
 class SubscriptionService implements SubscriptionServiceInterface
 {
     public function __construct(
         private readonly SubscriptionRepositoryInterface $subscriptionRepository,
-        private readonly WeatherRepositoryInterface $weatherRepository,
+        private readonly WeatherModuleInterface $weatherModule,
         private readonly TokenFactoryInterface $tokenFactory
     ) {
     }
@@ -38,7 +38,7 @@ class SubscriptionService implements SubscriptionServiceInterface
      */
     public function subscribe(Email $email, City $city, Frequency $frequency): Subscription
     {
-        if (!$this->weatherRepository->cityExists($city)) {
+        if (!$this->weatherModule->cityExists($city->getName())) {
             throw new CityNotFoundException();
         }
 

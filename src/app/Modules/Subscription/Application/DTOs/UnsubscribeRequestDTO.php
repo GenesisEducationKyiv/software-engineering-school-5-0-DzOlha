@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Application\Subscription\DTOs;
+namespace App\Modules\Subscription\Application\DTOs;
 
-use App\Domain\Subscription\ValueObjects\Token\Token;
+use App\Modules\Subscription\Domain\ValueObjects\Token\Token;
 
 class UnsubscribeRequestDTO
 {

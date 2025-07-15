@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domain\Subscription\ValueObjects\Frequency;
+namespace App\Modules\Subscription\Domain\ValueObjects\Frequency;
 
 use App\Exceptions\ValidationException;
 

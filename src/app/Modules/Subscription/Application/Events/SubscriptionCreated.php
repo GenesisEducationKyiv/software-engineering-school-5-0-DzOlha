@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Modules\Subscription\Domain\Events;
+namespace App\Modules\Subscription\Application\Events;
 
 use App\Modules\Subscription\Domain\Entities\Subscription;
 use Illuminate\Broadcasting\InteractsWithSockets;

@@ -1,22 +1,22 @@
 <?php
 
-namespace App\Infrastructure\Subscription\Repositories;
+namespace App\Modules\Subscription\Infrastructure\Repositories;
 
-use App\Domain\Subscription\Entities\Subscription as SubscriptionEntity;
-use App\Domain\Subscription\Repositories\SubscriptionRepositoryInterface;
-use App\Domain\Subscription\ValueObjects\Email\Email;
-use App\Domain\Subscription\ValueObjects\Frequency\Frequency as FrequencyValueObject;
-use App\Domain\Subscription\ValueObjects\Status\Status;
-use App\Domain\Subscription\ValueObjects\Token\Token as TokenValueObject;
-use App\Domain\Subscription\ValueObjects\Token\TokenType;
-use App\Domain\Weather\ValueObjects\City\City as CityValueObject;
 use App\Exceptions\Custom\FrequencyNotFoundException;
-use App\Infrastructure\Subscription\Models\City;
-use App\Infrastructure\Subscription\Models\Frequency;
-use App\Infrastructure\Subscription\Models\Subscription;
-use App\Infrastructure\Subscription\Models\SubscriptionEmail;
-use App\Infrastructure\Subscription\Models\SubscriptionToken;
-use App\Infrastructure\Subscription\Models\User;
+use App\Modules\Subscription\Domain\Entities\Subscription as SubscriptionEntity;
+use App\Modules\Subscription\Domain\Repositories\SubscriptionRepositoryInterface;
+use App\Modules\Subscription\Domain\ValueObjects\Email\Email;
+use App\Modules\Subscription\Domain\ValueObjects\Frequency\Frequency as FrequencyValueObject;
+use App\Modules\Subscription\Domain\ValueObjects\Status\Status;
+use App\Modules\Subscription\Domain\ValueObjects\Token\Token as TokenValueObject;
+use App\Modules\Subscription\Domain\ValueObjects\Token\TokenType;
+use App\Modules\Subscription\Infrastructure\Models\City;
+use App\Modules\Subscription\Infrastructure\Models\Frequency;
+use App\Modules\Subscription\Infrastructure\Models\Subscription;
+use App\Modules\Subscription\Infrastructure\Models\SubscriptionEmail;
+use App\Modules\Subscription\Infrastructure\Models\SubscriptionToken;
+use App\Modules\Subscription\Infrastructure\Models\User;
+use App\Modules\Subscription\Domain\ValueObjects\City\City as CityValueObject;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;

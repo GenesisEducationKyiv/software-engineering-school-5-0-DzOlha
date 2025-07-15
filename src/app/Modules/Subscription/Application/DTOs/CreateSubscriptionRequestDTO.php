@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Application\Subscription\DTOs;
+namespace App\Modules\Subscription\Application\DTOs;
 
 class CreateSubscriptionRequestDTO
 {

@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Domain\Subscription\Entities;
+namespace App\Modules\Subscription\Domain\Entities;
 
-use App\Domain\Subscription\ValueObjects\Email\Email;
-use App\Domain\Subscription\ValueObjects\Frequency\Frequency;
-use App\Domain\Subscription\ValueObjects\Status\Status;
-use App\Domain\Subscription\ValueObjects\Token\Token;
-use App\Domain\Weather\ValueObjects\City\City;
+use App\Modules\Subscription\Domain\ValueObjects\Email\Email;
+use App\Modules\Subscription\Domain\ValueObjects\Frequency\Frequency;
+use App\Modules\Subscription\Domain\ValueObjects\Status\Status;
+use App\Modules\Subscription\Domain\ValueObjects\Token\Token;
+use App\Modules\Subscription\Domain\ValueObjects\City\City;
 
 class Subscription
 {

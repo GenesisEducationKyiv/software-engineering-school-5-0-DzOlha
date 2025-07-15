@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Domain\Subscription\ValueObjects\Token\Factory;
+namespace App\Modules\Subscription\Domain\ValueObjects\Token\Factory;
 
-use App\Domain\Subscription\ValueObjects\Token\Token;
-use App\Domain\Subscription\ValueObjects\Token\TokenType;
+use App\Modules\Subscription\Domain\ValueObjects\Token\Token;
+use App\Modules\Subscription\Domain\ValueObjects\Token\TokenType;
 use DateTimeInterface;
 
 interface TokenFactoryInterface

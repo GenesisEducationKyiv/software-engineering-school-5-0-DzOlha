@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Infrastructure\Subscription\Models;
+namespace App\Modules\Subscription\Infrastructure\Models;
 
 use Illuminate\Database\Eloquent\Model;
 

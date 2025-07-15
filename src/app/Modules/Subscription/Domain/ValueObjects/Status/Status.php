@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domain\Subscription\ValueObjects\Status;
+namespace App\Modules\Subscription\Domain\ValueObjects\Status;
 
 use App\Exceptions\ValidationException;
 

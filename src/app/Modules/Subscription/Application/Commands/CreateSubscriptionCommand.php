@@ -1,18 +1,18 @@
 <?php
 
-namespace App\Application\Subscription\Commands;
+namespace App\Modules\Subscription\Application\Commands;
 
-use App\Application\Subscription\DTOs\CreateSubscriptionRequestDTO;
-use App\Application\Subscription\Services\SubscriptionServiceInterface;
-use App\Domain\Subscription\ValueObjects\Email\Email;
-use App\Domain\Subscription\ValueObjects\Frequency\Frequency;
-use App\Domain\Weather\ValueObjects\City\City;
 use App\Exceptions\Custom\ApiAccessException;
 use App\Exceptions\Custom\CityNotFoundException;
 use App\Exceptions\Custom\EmailAlreadySubscribedException;
 use App\Exceptions\Custom\FrequencyNotFoundException;
 use App\Exceptions\Custom\SubscriptionAlreadyPendingException;
 use App\Exceptions\ValidationException;
+use App\Modules\Subscription\Application\DTOs\CreateSubscriptionRequestDTO;
+use App\Modules\Subscription\Application\Services\SubscriptionServiceInterface;
+use App\Modules\Subscription\Domain\ValueObjects\Email\Email;
+use App\Modules\Subscription\Domain\ValueObjects\Frequency\Frequency;
+use App\Modules\Subscription\Domain\ValueObjects\City\City;
 
 class CreateSubscriptionCommand
 {

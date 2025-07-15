@@ -1,10 +1,9 @@
 <?php
 
-namespace App\Infrastructure\Subscription\Models;
+namespace App\Modules\Subscription\Infrastructure\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use App\Infrastructure\Subscription\Models\Subscription;
 
 class SubscriptionEmail extends Model
 {

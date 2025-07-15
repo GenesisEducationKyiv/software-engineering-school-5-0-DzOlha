@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Domain\Subscription\ValueObjects\Token;
+namespace App\Modules\Subscription\Domain\ValueObjects\Token;
 
-use App\Domain\Subscription\ValueObjects\Token\Validator\TokenValidator;
-use App\Domain\Subscription\ValueObjects\Token\Validator\TokenValidatorInterface;
 use App\Exceptions\ValidationException;
+use App\Modules\Subscription\Domain\ValueObjects\Token\Validator\TokenValidator;
+use App\Modules\Subscription\Domain\ValueObjects\Token\Validator\TokenValidatorInterface;
 use DateTimeInterface;
 
 class Token

@@ -1,12 +1,12 @@
 <?php
 
 namespace App\Domain\Subscription\Factories;
-namespace App\Domain\Subscription\ValueObjects\Token\Factory;
+namespace App\Modules\Subscription\Domain\ValueObjects\Token\Factory;
 
-use App\Domain\Subscription\ValueObjects\Token\Generator\TokenGeneratorInterface;
-use App\Domain\Subscription\ValueObjects\Token\Token;
-use App\Domain\Subscription\ValueObjects\Token\TokenType;
 use App\Exceptions\ValidationException;
+use App\Modules\Subscription\Domain\ValueObjects\Token\Generator\TokenGeneratorInterface;
+use App\Modules\Subscription\Domain\ValueObjects\Token\Token;
+use App\Modules\Subscription\Domain\ValueObjects\Token\TokenType;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Random\RandomException;

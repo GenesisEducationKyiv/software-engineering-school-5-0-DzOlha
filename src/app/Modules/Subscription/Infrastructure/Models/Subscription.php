@@ -1,14 +1,10 @@
 <?php
 
-namespace App\Infrastructure\Subscription\Models;
+namespace App\Modules\Subscription\Infrastructure\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use App\Infrastructure\Subscription\Models\User;
-use App\Infrastructure\Subscription\Models\Frequency;
-use App\Infrastructure\Subscription\Models\SubscriptionEmail;
-use App\Infrastructure\Subscription\Models\SubscriptionToken;
 
 class Subscription extends Model
 {

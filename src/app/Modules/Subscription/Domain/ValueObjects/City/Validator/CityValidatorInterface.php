@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Modules\Subscription\Domain\ValueObjects\Token\Validator;
+namespace App\Modules\Subscription\Domain\ValueObjects\City\Validator;
 
 use App\Exceptions\ValidationException;
 
-interface TokenValidatorInterface
+interface CityValidatorInterface
 {
     /**
      * @param string $value
@@ -12,5 +12,6 @@ interface TokenValidatorInterface
      * @throws ValidationException
      */
     public function assertValid(string $value): void;
+
     public function isValid(string $value): bool;
 }

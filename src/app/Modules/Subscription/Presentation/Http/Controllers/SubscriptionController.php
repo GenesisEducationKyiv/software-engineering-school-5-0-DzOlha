@@ -1,15 +1,7 @@
 <?php
 
-namespace App\Presentation\Api\Controllers;
+namespace App\Modules\Subscription\Presentation\Http\Controllers;
 
-use App\Application\Subscription\Commands\ConfirmSubscriptionCommand;
-use App\Application\Subscription\Commands\CreateSubscriptionCommand;
-use App\Application\Subscription\Commands\UnsubscribeCommand;
-use App\Application\Subscription\DTOs\ConfirmSubscriptionRequestDTO;
-use App\Application\Subscription\DTOs\CreateSubscriptionRequestDTO;
-use App\Application\Subscription\DTOs\UnsubscribeRequestDTO;
-use App\Domain\Subscription\ValueObjects\Token\Token;
-use App\Domain\Subscription\ValueObjects\Token\TokenType;
 use App\Exceptions\Custom\ApiAccessException;
 use App\Exceptions\Custom\CityNotFoundException;
 use App\Exceptions\Custom\EmailAlreadySubscribedException;
@@ -17,7 +9,16 @@ use App\Exceptions\Custom\FrequencyNotFoundException;
 use App\Exceptions\Custom\SubscriptionAlreadyPendingException;
 use App\Exceptions\Custom\TokenNotFoundException;
 use App\Exceptions\ValidationException;
-use App\Presentation\Api\Requests\SubscribeRequest;
+use App\Modules\Subscription\Application\Commands\ConfirmSubscriptionCommand;
+use App\Modules\Subscription\Application\Commands\CreateSubscriptionCommand;
+use App\Modules\Subscription\Application\Commands\UnsubscribeCommand;
+use App\Modules\Subscription\Application\DTOs\ConfirmSubscriptionRequestDTO;
+use App\Modules\Subscription\Application\DTOs\CreateSubscriptionRequestDTO;
+use App\Modules\Subscription\Application\DTOs\UnsubscribeRequestDTO;
+use App\Modules\Subscription\Domain\ValueObjects\Token\Token;
+use App\Modules\Subscription\Domain\ValueObjects\Token\TokenType;
+use App\Modules\Subscription\Presentation\Http\Requests\SubscribeRequest;
+use App\Presentation\Api\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 
 class SubscriptionController extends Controller
