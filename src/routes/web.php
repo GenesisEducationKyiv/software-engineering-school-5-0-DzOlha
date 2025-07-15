@@ -1,6 +1,6 @@
 <?php
 
-use App\Presentation\Api\Controllers\MetricsController;
+use App\Modules\Weather\Presentation\Http\Controllers\MetricsController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {

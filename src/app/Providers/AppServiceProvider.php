@@ -2,36 +2,46 @@
 
 namespace App\Providers;
 
-use App\Application\Subscription\Emails\EmailServiceInterface;
-use App\Application\Subscription\Emails\Mailers\MailerInterface;
-use App\Application\Subscription\Emails\Services\EmailService;
-use App\Application\Subscription\Listeners\SendConfirmationEmail;
-use App\Application\Subscription\Listeners\SendWeatherUpdateEmail;
-use App\Application\Subscription\Services\SubscriptionService;
-use App\Application\Subscription\Services\SubscriptionServiceInterface;
-use App\Application\Subscription\Utils\Builders\SubscriptionLinkBuilderInterface;
-use App\Application\Weather\HttpClient\Decorators\HttpClientWithLogger;
-use App\Application\Weather\HttpClient\HttpClientInterface;
-use App\Application\Weather\Services\WeatherService;
-use App\Application\Weather\Services\WeatherServiceInterface;
-use App\Domain\Subscription\Events\SubscriptionConfirmed;
-use App\Domain\Subscription\Events\SubscriptionCreated;
-use App\Domain\Subscription\Repositories\SubscriptionRepositoryInterface;
-use App\Domain\Subscription\ValueObjects\Token\Factory\TokenFactory;
-use App\Domain\Subscription\ValueObjects\Token\Factory\TokenFactoryInterface;
-use App\Domain\Subscription\ValueObjects\Token\Generator\TokenGeneratorInterface;
-use App\Domain\Weather\Repositories\Cache\Monitor\WeatherCacheMonitorInterface;
-use App\Domain\Weather\Repositories\Chain\Builder\WeatherChainBuilderInterface;
-use App\Domain\Weather\Repositories\WeatherRepositoryInterface;
-use App\Infrastructure\Subscription\Emails\Mailers\LaravelMailer;
-use App\Infrastructure\Subscription\Repositories\SubscriptionRepository;
-use App\Infrastructure\Subscription\Token\Generator\TokenGenerator;
-use App\Infrastructure\Subscription\Utils\Builders\SubscriptionLinkBuilder;
-use App\Infrastructure\Weather\HttpClient\HttpClient;
-use App\Infrastructure\Weather\HttpClient\Logger\FileHttpLogger;
-use App\Infrastructure\Weather\Repositories\Cache\Monitor\PrometheusWeatherCacheMonitor;
-use App\Infrastructure\Weather\Repositories\Cache\WeatherRepositoryCache;
-use App\Infrastructure\Weather\Repositories\Chain\Builder\WeatherChainBuilder;
+use App\Modules\Email\Application\EmailServiceInterface;
+use App\Modules\Email\Application\Mailers\MailerInterface;
+use App\Modules\Email\Application\Services\EmailService;
+use App\Modules\Email\Application\Utils\Builders\SubscriptionLinkBuilderInterface;
+use App\Modules\Email\Infrastructure\Mailers\LaravelMailer;
+use App\Modules\Email\Infrastructure\Utils\Builders\SubscriptionLinkBuilder;
+use App\Modules\Email\Presentation\Interface\EmailModule;
+use App\Modules\Email\Presentation\Interface\EmailModuleInterface;
+use App\Modules\Notification\Application\Events\NotificationSubscriptionConfirmed;
+use App\Modules\Notification\Application\Events\NotificationSubscriptionCreated;
+use App\Modules\Notification\Application\Listeners\Forwarders\SubscriptionConfirmedForwarder;
+use App\Modules\Notification\Application\Listeners\Forwarders\SubscriptionCreatedForwarder;
+use App\Modules\Notification\Application\Listeners\SendConfirmationEmail;
+use App\Modules\Notification\Application\Listeners\SendWeatherUpdateEmail;
+use App\Modules\Subscription\Application\Events\SubscriptionConfirmed;
+use App\Modules\Subscription\Application\Events\SubscriptionCreated;
+use App\Modules\Subscription\Application\Services\SubscriptionService;
+use App\Modules\Subscription\Application\Services\SubscriptionServiceInterface;
+use App\Modules\Subscription\Domain\Repositories\SubscriptionRepositoryInterface;
+use App\Modules\Subscription\Domain\ValueObjects\Token\Factory\TokenFactory;
+use App\Modules\Subscription\Domain\ValueObjects\Token\Factory\TokenFactoryInterface;
+use App\Modules\Subscription\Domain\ValueObjects\Token\Generator\TokenGeneratorInterface;
+use App\Modules\Subscription\Infrastructure\Repositories\SubscriptionRepository;
+use App\Modules\Subscription\Infrastructure\Token\Generator\TokenGenerator;
+use App\Modules\Subscription\Presentation\Interface\SubscriptionModule;
+use App\Modules\Subscription\Presentation\Interface\SubscriptionModuleInterface;
+use App\Modules\Weather\Application\HttpClient\Decorators\HttpClientWithLogger;
+use App\Modules\Weather\Application\HttpClient\HttpClientInterface;
+use App\Modules\Weather\Application\Services\WeatherService;
+use App\Modules\Weather\Application\Services\WeatherServiceInterface;
+use App\Modules\Weather\Domain\Repositories\Cache\Monitor\WeatherCacheMonitorInterface;
+use App\Modules\Weather\Domain\Repositories\Chain\Builder\WeatherChainBuilderInterface;
+use App\Modules\Weather\Domain\Repositories\WeatherRepositoryInterface;
+use App\Modules\Weather\Infrastructure\HttpClient\HttpClient;
+use App\Modules\Weather\Infrastructure\HttpClient\Logger\FileHttpLogger;
+use App\Modules\Weather\Infrastructure\Repositories\Cache\Monitor\PrometheusWeatherCacheMonitor;
+use App\Modules\Weather\Infrastructure\Repositories\Cache\WeatherRepositoryCache;
+use App\Modules\Weather\Infrastructure\Repositories\Chain\Builder\WeatherChainBuilder;
+use App\Modules\Weather\Presentation\Interface\WeatherModule;
+use App\Modules\Weather\Presentation\Interface\WeatherModuleInterface;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Facades\Event;
@@ -104,6 +114,10 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(EmailServiceInterface::class, EmailService::class);
 
         $this->app->singleton(SubscriptionLinkBuilderInterface::class, SubscriptionLinkBuilder::class);
+
+        $this->app->singleton(SubscriptionModuleInterface::class, SubscriptionModule::class);
+        $this->app->singleton(WeatherModuleInterface::class, WeatherModule::class);
+        $this->app->singleton(EmailModuleInterface::class, EmailModule::class);
     }
 
     /**
@@ -113,11 +127,19 @@ class AppServiceProvider extends ServiceProvider
     {
         Event::listen(
             SubscriptionCreated::class,
-            SendConfirmationEmail::class
+            SubscriptionCreatedForwarder::class
+        );
+        Event::listen(
+            SubscriptionConfirmed::class,
+            SubscriptionConfirmedForwarder::class
         );
 
         Event::listen(
-            SubscriptionConfirmed::class,
+            NotificationSubscriptionCreated::class,
+            SendConfirmationEmail::class
+        );
+        Event::listen(
+            NotificationSubscriptionConfirmed::class,
             SendWeatherUpdateEmail::class
         );
     }

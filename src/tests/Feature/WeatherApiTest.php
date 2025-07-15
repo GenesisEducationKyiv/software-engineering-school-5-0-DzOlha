@@ -2,12 +2,12 @@
 
 namespace Tests\Feature;
 
-use App\Domain\Subscription\Entities\Subscription;
-use App\Domain\Subscription\Repositories\SubscriptionRepositoryInterface;
-use App\Domain\Subscription\ValueObjects\Email\Email;
-use App\Domain\Subscription\ValueObjects\Frequency\Frequency;
-use App\Domain\Weather\ValueObjects\City\City;
 use App\Exceptions\ValidationException;
+use App\Modules\Subscription\Domain\Entities\Subscription;
+use App\Modules\Subscription\Domain\Repositories\SubscriptionRepositoryInterface;
+use App\Modules\Subscription\Domain\ValueObjects\Email\Email;
+use App\Modules\Subscription\Domain\ValueObjects\Frequency\Frequency;
+use App\Modules\Subscription\Domain\ValueObjects\City\City;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\App;
 use PHPUnit\Framework\Attributes\DataProvider;
