@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Application\Subscription\Listeners;
+namespace App\Modules\Notification\Application\Listeners;
 
-use App\Application\Subscription\Jobs\SendWeatherUpdates;
-use App\Domain\Subscription\Events\SubscriptionConfirmed;
+use App\Modules\Notification\Application\Events\NotificationSubscriptionConfirmed;
+use App\Modules\Notification\Application\Jobs\SendWeatherUpdates;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Log;
 
@@ -13,7 +13,7 @@ class SendWeatherUpdateEmail implements ShouldQueue
     {
     }
 
-    public function handle(SubscriptionConfirmed $event): void
+    public function handle(NotificationSubscriptionConfirmed $event): void
     {
         $subscriptionId = $event->subscription->getId();
 

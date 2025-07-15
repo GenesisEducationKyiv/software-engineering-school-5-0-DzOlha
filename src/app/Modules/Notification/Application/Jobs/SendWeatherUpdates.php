@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Application\Subscription\Jobs;
+namespace App\Modules\Notification\Application\Jobs;
 
-use App\Application\Subscription\Emails\EmailServiceInterface;
-use App\Application\Weather\Services\WeatherServiceInterface;
-use App\Domain\Subscription\Entities\Subscription;
-use App\Domain\Subscription\Repositories\SubscriptionRepositoryInterface;
-use App\Modules\Weather\Application\DTOs\WeatherRequestDTO;
+use App\Modules\Notification\Domain\Entities\NotificationSubscriptionEntity;
+use App\Modules\Email\Presentation\Interface\EmailModuleInterface;
+use App\Modules\Subscription\Presentation\Interface\SubscriptionModuleInterface;
+use App\Modules\Weather\Presentation\Interface\WeatherModuleInterface;
+use App\Modules\Subscription\Domain\Entities\Subscription;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -28,26 +28,31 @@ class SendWeatherUpdates implements ShouldQueue
     }
 
     public function handle(
-        WeatherServiceInterface $weatherService,
-        EmailServiceInterface $emailService,
-        SubscriptionRepositoryInterface $subscriptionRepository
+        WeatherModuleInterface $weatherModule,
+        EmailModuleInterface $emailModule,
+        SubscriptionModuleInterface $subscriptionModule
     ): void {
         Log::info('Running weather update job', ['subscription_id' => $this->subscriptionId]);
-        /**
-         * @var ?Subscription $subscription
-         */
-        $subscription = $subscriptionRepository->findSubscriptionById($this->subscriptionId);
 
-        if (!$subscription || !$subscription->isActive()) {
+        $subscriptionExternal = $subscriptionModule->findSubscriptionEntityById($this->subscriptionId);
+
+        if (!$subscriptionExternal || !$subscriptionExternal->isActive()) {
             Log::info('Skipping weather update: inactive or missing subscription', [
                 'subscription_id' => $this->subscriptionId,
             ]);
             return;
         }
 
-        Log::info('Subscription entity:', [
-            'subscription' => $subscription->toArray()
-        ]);
+        $subscription = new NotificationSubscriptionEntity(
+            id: $subscriptionExternal->getId(),
+            email: $subscriptionExternal->getEmail()->getValue(),
+            city: $subscriptionExternal->getCity()->getName(),
+            frequency: $subscriptionExternal->getFrequency()->getName(),
+            confirmationToken: $subscriptionExternal->getConfirmationToken()?->getValue(),
+            unsubscribeToken: $subscriptionExternal->getUnsubscribeToken()?->getValue(),
+            isActive: $subscriptionExternal->isActive(),
+            intervalMinutes: $subscriptionExternal->getFrequency()->getIntervalMinutes()
+        );
 
         $subscriptionId = $subscription->getId();
         if ($subscriptionId === null) {
@@ -55,16 +60,28 @@ class SendWeatherUpdates implements ShouldQueue
             return;
         }
 
-        $weatherData = $weatherService->getCurrentWeather(
-            new WeatherRequestDTO($subscription->getCity())
+        $weatherData = $weatherModule->getCurrentWeather($subscription->getCity());
+
+        $sent = $emailModule->sendWeatherUpdate(
+            $emailModule->getEmailSubscriptionEntity(
+                $subscription->getId(),
+                $subscription->getEmail(),
+                $subscription->getCity(),
+                $subscription->getFrequency(),
+                $subscription->getConfirmationToken(),
+                $subscription->getUnsubscribeToken()
+            ),
+            $emailModule->getEmailWeatherEntity(
+                $weatherData->getTemperature(),
+                $weatherData->getHumidity(),
+                $weatherData->getDescription()
+            )
         );
 
-        $sent = $emailService->sendWeatherUpdate($subscription, $weatherData);
-
         if ($sent) {
-            $intervalMinutes = $subscription->getFrequency()->getIntervalMinutes();
+            $intervalMinutes = $subscription->getIntervalMinutes();
 
-            $subscriptionRepository->updateSubscriptionEmailStatus(
+            $subscriptionModule->updateSubscriptionEmailStatus(
                 $subscriptionId,
                 $intervalMinutes
             );
@@ -81,7 +98,7 @@ class SendWeatherUpdates implements ShouldQueue
             /**
              * Update with error status and retry in 60 minutes
              */
-            $updated = $subscriptionRepository->updateSubscriptionEmailStatus(
+            $updated = $subscriptionModule->updateSubscriptionEmailStatus(
                 $subscriptionId,
                 $this->retryMinutes,
                 false

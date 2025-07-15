@@ -1,22 +1,22 @@
 <?php
 
-namespace App\Application\Subscription\Listeners;
+namespace App\Modules\Notification\Application\Listeners;
 
-use App\Application\Subscription\Emails\EmailServiceInterface;
-use App\Domain\Subscription\Events\SubscriptionCreated;
-use App\Domain\Subscription\Repositories\SubscriptionRepositoryInterface;
+use App\Modules\Email\Presentation\Interface\EmailModuleInterface;
+use App\Modules\Notification\Application\Events\NotificationSubscriptionCreated;
+use App\Modules\Subscription\Presentation\Interface\SubscriptionModuleInterface;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Log;
 
 class SendConfirmationEmail implements ShouldQueue
 {
     public function __construct(
-        private readonly EmailServiceInterface $emailService,
-        private readonly SubscriptionRepositoryInterface $repository
+        private readonly EmailModuleInterface $emailModule,
+        private readonly SubscriptionModuleInterface $subscriptionModule
     ) {
     }
 
-    public function handle(SubscriptionCreated $event): void
+    public function handle(NotificationSubscriptionCreated $event): void
     {
         $id = $event->subscription->getId();
 
@@ -29,10 +29,19 @@ class SendConfirmationEmail implements ShouldQueue
             'subscription_id' => $id
         ]);
 
-        $emailSent = $this->emailService->sendConfirmationEmail($event->subscription);
+        $emailSent = $this->emailModule->sendConfirmationEmail(
+            $this->emailModule->getEmailSubscriptionEntity(
+                $event->subscription->getId(),
+                $event->subscription->getEmail(),
+                $event->subscription->getCity(),
+                $event->subscription->getFrequency(),
+                $event->subscription->getConfirmationToken(),
+                $event->subscription->getUnsubscribeToken()
+            )
+        );
 
         if (!$emailSent) {
-            $this->repository->delete($id);
+            $this->subscriptionModule->deleteSubscription($id);
             Log::info(
                 "Subscription ID {$id} deleted due to failed confirmation email."
             );
