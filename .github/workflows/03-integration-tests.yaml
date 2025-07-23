@@ -33,7 +33,7 @@ jobs:
             echo "WEATHER_STACK_API_KEY=${{ secrets.WEATHER_STACK_API_KEY }}" >> infra/test/php/.env
 
       - name: Build all images
-        run: docker compose -f infra/test/docker-compose.yaml build integration-runner postgres redis mailpit queue-runner
+        run: docker compose -f infra/test/docker-compose.yaml build integration-runner postgres redis mailpit queue-runner rabbitmq rabbitmq-consumer
 
       - name: Run integration tests
         run: |
