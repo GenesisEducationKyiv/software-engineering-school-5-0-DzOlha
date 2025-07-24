@@ -46,12 +46,12 @@ class NotificationSubscriptionEntity
         return $this->frequency;
     }
 
-    public function isActive(): bool
+    public function isActive(): ?bool
     {
         return $this->isActive;
     }
 
-    public function getIntervalMinutes(): int
+    public function getIntervalMinutes(): ?int
     {
         return $this->intervalMinutes;
     }

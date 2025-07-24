@@ -12,8 +12,7 @@ readonly class EventMessage implements MessageInterface
         private EventInterface $event,
         private RoutingStrategyInterface $routingStrategy,
         private EventKeyGeneratorInterface $keyGenerator
-    )
-    {
+    ) {
     }
 
     public function getRoutingKey(): string
