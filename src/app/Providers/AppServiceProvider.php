@@ -10,14 +10,6 @@ use App\Modules\Email\Infrastructure\Mailers\LaravelMailer;
 use App\Modules\Email\Infrastructure\Utils\Builders\SubscriptionLinkBuilder;
 use App\Modules\Email\Presentation\Interface\EmailModule;
 use App\Modules\Email\Presentation\Interface\EmailModuleInterface;
-use App\Modules\Notification\Application\Events\NotificationSubscriptionConfirmed;
-use App\Modules\Notification\Application\Events\NotificationSubscriptionCreated;
-use App\Modules\Notification\Application\Listeners\Forwarders\SubscriptionConfirmedForwarder;
-use App\Modules\Notification\Application\Listeners\Forwarders\SubscriptionCreatedForwarder;
-use App\Modules\Notification\Application\Listeners\SendConfirmationEmail;
-use App\Modules\Notification\Application\Listeners\SendWeatherUpdateEmail;
-use App\Modules\Subscription\Application\Events\SubscriptionConfirmed;
-use App\Modules\Subscription\Application\Events\SubscriptionCreated;
 use App\Modules\Subscription\Application\Services\SubscriptionService;
 use App\Modules\Subscription\Application\Services\SubscriptionServiceInterface;
 use App\Modules\Subscription\Domain\Repositories\SubscriptionRepositoryInterface;
@@ -125,22 +117,5 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Event::listen(
-            SubscriptionCreated::class,
-            SubscriptionCreatedForwarder::class
-        );
-        Event::listen(
-            SubscriptionConfirmed::class,
-            SubscriptionConfirmedForwarder::class
-        );
-
-        Event::listen(
-            NotificationSubscriptionCreated::class,
-            SendConfirmationEmail::class
-        );
-        Event::listen(
-            NotificationSubscriptionConfirmed::class,
-            SendWeatherUpdateEmail::class
-        );
     }
 }
