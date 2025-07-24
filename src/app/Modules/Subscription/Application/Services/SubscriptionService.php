@@ -10,8 +10,9 @@ use App\Exceptions\Custom\SubscriptionAlreadyPendingException;
 use App\Exceptions\Custom\TokenNotFoundException;
 use App\Modules\Subscription\Application\DTOs\ConfirmSubscriptionRequestDTO;
 use App\Modules\Subscription\Application\DTOs\UnsubscribeRequestDTO;
-use App\Modules\Subscription\Application\Events\SubscriptionConfirmed;
-use App\Modules\Subscription\Application\Events\SubscriptionCreated;
+use App\Modules\Subscription\Application\Messaging\Publishers\EventPublisherInterface;
+use App\Modules\Subscription\Application\Messaging\Events\SubscriptionConfirmed;
+use App\Modules\Subscription\Application\Messaging\Events\SubscriptionCreated;
 use App\Modules\Subscription\Domain\Entities\Subscription;
 use App\Modules\Subscription\Domain\Repositories\SubscriptionRepositoryInterface;
 use App\Modules\Subscription\Domain\ValueObjects\City\City;
@@ -25,7 +26,8 @@ class SubscriptionService implements SubscriptionServiceInterface
     public function __construct(
         private readonly SubscriptionRepositoryInterface $subscriptionRepository,
         private readonly WeatherModuleInterface $weatherModule,
-        private readonly TokenFactoryInterface $tokenFactory
+        private readonly TokenFactoryInterface $tokenFactory,
+        private readonly EventPublisherInterface $eventPublisher
     ) {
     }
 
@@ -68,7 +70,7 @@ class SubscriptionService implements SubscriptionServiceInterface
             $subEntity->setConfirmationToken($newConfirmToken);
             $subEntity->setUnsubscribeToken($newCancelToken);
 
-            SubscriptionCreated::dispatch($subEntity);
+            $this->eventPublisher->publish(new SubscriptionCreated($subEntity));
 
             return $subEntity;
         }
@@ -78,7 +80,7 @@ class SubscriptionService implements SubscriptionServiceInterface
 
         $subscription = $this->subscriptionRepository->save($subEntity);
 
-        SubscriptionCreated::dispatch($subscription);
+        $this->eventPublisher->publish(new SubscriptionCreated($subscription));
 
         return $subscription;
     }
@@ -96,7 +98,7 @@ class SubscriptionService implements SubscriptionServiceInterface
             throw new TokenNotFoundException();
         }
 
-        SubscriptionConfirmed::dispatch($confirmedSubscription);
+        $this->eventPublisher->publish(new SubscriptionConfirmed($confirmedSubscription));
 
         return $confirmedSubscription;
     }
