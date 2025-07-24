@@ -79,6 +79,9 @@ class SendWeatherUpdates implements ShouldQueue
         );
 
         if ($sent) {
+            /**
+             * @var int $intervalMinutes
+             */
             $intervalMinutes = $subscription->getIntervalMinutes();
 
             $subscriptionModule->updateSubscriptionEmailStatus(

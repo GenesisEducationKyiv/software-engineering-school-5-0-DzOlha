@@ -60,6 +60,14 @@ return new class extends Migration
             $table->timestamp('expires_at')->nullable();
             $table->timestamps();
         });
+
+        Schema::create('processed_events', function (Blueprint $table) {
+            $table->id();
+            $table->string('event_key', 36)->unique();
+            $table->string('event_name', 50);
+            $table->tinyInteger('status'); // 0 - not processed, 1 - processed
+            $table->timestamps();
+        });
     }
 
     /**

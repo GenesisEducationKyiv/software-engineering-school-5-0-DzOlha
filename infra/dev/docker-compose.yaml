@@ -26,16 +26,15 @@ services:
     volumes:
       - ../../src:/var/www/html
       - ./php/.env:/var/www/html/.env
+    restart: unless-stopped
     env_file:
       - ./php/.env
     depends_on:
-      - php
       - redis
 
   mailpit:
     image: axllent/mailpit
     ports:
-      - "1025:1025"  # SMTP
       - "8025:8025"  # Web UI
 
   nginx:
@@ -109,8 +108,35 @@ services:
     depends_on:
       - prometheus
 
+  rabbitmq:
+    build:
+      context: ../../
+      dockerfile: infra/dev/rabbitmq/Dockerfile
+    ports:
+      - "15672:15672" # Management UI
+    env_file:
+      - ./rabbitmq/.env
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+
+  rabbitmq-consumer:
+    build:
+      context: ../../
+      dockerfile: infra/dev/php/Dockerfile
+    working_dir: /var/www/html
+    command: [ "php", "artisan", "rabbitmq-events:consume" ]
+    volumes:
+      - ../../src:/var/www/html
+      - ./php/.env:/var/www/html/.env
+    restart: unless-stopped
+    env_file:
+      - ./php/.env
+    depends_on:
+      - rabbitmq
+
 volumes:
   pgdata:
   redisdata:
   grafana-data:
+  rabbitmq-data:
 

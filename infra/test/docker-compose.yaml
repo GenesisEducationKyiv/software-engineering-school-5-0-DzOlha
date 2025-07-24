@@ -7,7 +7,7 @@ services:
     entrypoint: [ "/usr/local/bin/entrypoint.sh" ]
     command: [ "php-fpm" ]
     environment:
-      RUN_MIGRATIONS: "true"
+      INTEGRATION_MODE: "true"
     env_file:
       - ./php/.env
     depends_on:
@@ -19,6 +19,8 @@ services:
         condition: service_healthy
       queue-runner:
         condition: service_started
+      rabbitmq:
+        condition: service_healthy
     healthcheck:
       test: [ "CMD", "php", "-r", "echo 'OK';" ]
       interval: 10s
@@ -64,8 +66,6 @@ services:
   # Mail service
   mailpit:
     image: axllent/mailpit
-    ports:
-      - "1025:1025"  # SMTP
 
   # Queue worker for Laravel jobs
   queue-runner:
@@ -80,6 +80,34 @@ services:
       - redis
       - mailpit
 
+  rabbitmq:
+    build:
+      context: ../../
+      dockerfile: infra/test/rabbitmq/Dockerfile
+    env_file:
+      - ./rabbitmq/.env
+    healthcheck:
+      test: [ "CMD", "rabbitmq-diagnostics", "ping" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+
+  rabbitmq-consumer:
+    build:
+      context: ../../
+      dockerfile: infra/test/php/Dockerfile
+    working_dir: /var/www/html
+    command: [ "php", "artisan", "rabbitmq-events:consume" ]
+    volumes:
+      - ../../src:/var/www/html
+      - ./php/.env:/var/www/html/.env
+    restart: unless-stopped
+    env_file:
+      - ./php/.env
+    depends_on:
+      - rabbitmq
+
   # E2E tests via Playwright
   e2e-runner:
     build:
@@ -92,6 +120,8 @@ services:
         condition: service_healthy
       postgres:
         condition: service_healthy
+      rabbitmq:
+        condition: service_started
     environment:
       BASE_URL: http://nginx:80/
 
@@ -105,7 +135,7 @@ services:
     env_file:
       - ./php/.env
     environment:
-      RUN_MIGRATIONS: "true"
+      INTEGRATION_MODE: "true"
     depends_on:
       postgres:
         condition: service_healthy
@@ -114,6 +144,8 @@ services:
       mailpit:
         condition: service_healthy
       queue-runner:
+        condition: service_started
+      rabbitmq:
         condition: service_started
 
   # Unit tests (lightweight, no infra)
@@ -126,4 +158,4 @@ services:
     env_file:
       - ./php/.env.unit
     environment:
-      RUN_MIGRATIONS: "false"
+      INTEGRATION_MODE: "false"
