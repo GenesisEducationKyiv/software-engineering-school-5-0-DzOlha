@@ -2,8 +2,6 @@
 
 namespace App\Modules\Notification\Domain\Entities;
 
-use App\Modules\Subscription\Domain\Entities\Subscription;
-
 class NotificationSubscriptionEntity
 {
     public function __construct(
@@ -13,8 +11,8 @@ class NotificationSubscriptionEntity
         private readonly string $frequency,
         private readonly ?string $confirmationToken,
         private readonly ?string $unsubscribeToken,
-        private readonly bool $isActive,
-        private readonly int $intervalMinutes
+        private readonly ?bool $isActive,
+        private readonly ?int $intervalMinutes = null
     ) {
     }
 
@@ -56,5 +54,29 @@ class NotificationSubscriptionEntity
     public function getIntervalMinutes(): int
     {
         return $this->intervalMinutes;
+    }
+
+    /**
+     * @param array{
+     *     id: int|null,
+     *     email: string,
+     *     city: array{name: string},
+     *     frequency: array{id: int, name: string},
+     *     status: string,
+     *     confirmation_token: string|null,
+     *     unsubscribe_token: string|null
+     * } $data
+     */
+    public static function fromArray(array $data): self
+    {
+        return new self(
+            id: $data['id'] ?? null,
+            email: $data['email'],
+            city: $data['city']['name'],
+            frequency: $data['frequency']['name'],
+            confirmationToken: $data['confirmation_token'] ?? null,
+            unsubscribeToken: $data['unsubscribe_token'] ?? null,
+            isActive: $data['status'] === 'active'
+        );
     }
 }
