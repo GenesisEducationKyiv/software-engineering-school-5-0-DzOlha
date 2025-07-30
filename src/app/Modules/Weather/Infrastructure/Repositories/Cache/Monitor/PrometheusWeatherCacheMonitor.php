@@ -2,6 +2,7 @@
 
 namespace App\Modules\Weather\Infrastructure\Repositories\Cache\Monitor;
 
+use App\Modules\Observability\Presentation\Interface\ObservabilityModuleInterface;
 use App\Modules\Weather\Domain\Repositories\Cache\Monitor\WeatherCacheMonitorInterface;
 use Prometheus\CollectorRegistry;
 use Prometheus\Exception\MetricsRegistrationException;
@@ -13,7 +14,8 @@ class PrometheusWeatherCacheMonitor implements WeatherCacheMonitorInterface
     private const MISS_TOTAL = 'miss_total';
 
     public function __construct(
-        private readonly CollectorRegistry $registry
+        private readonly CollectorRegistry $registry,
+        private readonly ObservabilityModuleInterface $monitor
     ) {
     }
 
@@ -29,6 +31,8 @@ class PrometheusWeatherCacheMonitor implements WeatherCacheMonitorInterface
             ['location', 'type']
         );
         $counter->inc([$location, $type]);
+
+        $this->monitor->metrics()->incrementCacheHits(self::HIT_TOTAL);
     }
 
     /**
@@ -43,5 +47,7 @@ class PrometheusWeatherCacheMonitor implements WeatherCacheMonitorInterface
             ['location', 'type']
         );
         $counter->inc([$location, $type]);
+
+        $this->monitor->metrics()->incrementCacheMisses(self::MISS_TOTAL);
     }
 }

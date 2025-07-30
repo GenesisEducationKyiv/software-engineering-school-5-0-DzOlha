@@ -3,6 +3,7 @@
 namespace App\Modules\Notification\Application\Messaging\Handlers;
 
 use App\Modules\Notification\Application\Messaging\Messages\EventBodyMessage;
+use App\Modules\Observability\Presentation\Interface\ObservabilityModuleInterface;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
@@ -19,6 +20,11 @@ abstract class EventHandler implements ShouldQueue
      */
     public array $backoff = [10, 30, 60]; // Retry backoff in seconds
     public int $timeout = 300; // 5 minutes timeout
+
+    public function __construct(
+        protected readonly ObservabilityModuleInterface $monitor
+    ) {
+    }
 
     abstract public function handle(EventBodyMessage $eventData): void;
 

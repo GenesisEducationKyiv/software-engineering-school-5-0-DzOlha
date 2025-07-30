@@ -30,15 +30,25 @@ class OpenWeatherRepository extends AbstractWeatherRepository
              */
             $data = $response->json();
 
+            $this->monitor->metrics()->incrementWeatherFetches(
+                $this->getProviderName(), $city->getName(), true
+            );
+
             return new WeatherData(
                 temperature: $data['main']['temp'],
                 humidity: $data['main']['humidity'],
                 description: $data['weather'][0]['description'],
             );
         } else {
+            $this->monitor->metrics()->incrementWeatherFetches(
+                $this->getProviderName(), $city->getName(), false
+            );
+
             if ($this->hasNotFoundError([$response->status()])) {
+                $this->logCityNotFound($city);
                 throw new CityNotFoundException();
             }
+            $this->logApiAccessError($city);
             throw new ApiAccessException();
         }
     }
@@ -55,9 +65,11 @@ class OpenWeatherRepository extends AbstractWeatherRepository
         }
 
         if ($this->hasNotFoundError([$response->status()])) {
+            $this->logCityNotFound($city);
             return false;
         }
 
+        $this->logApiAccessError($city);
         throw new ApiAccessException();
     }
 

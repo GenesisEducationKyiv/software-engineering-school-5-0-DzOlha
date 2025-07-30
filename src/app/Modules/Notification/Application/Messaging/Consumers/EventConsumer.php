@@ -5,23 +5,17 @@ namespace App\Modules\Notification\Application\Messaging\Consumers;
 use App\Modules\Notification\Application\Messaging\Executors\EventHandlerExecutorInterface;
 use App\Modules\Notification\Application\Messaging\Handlers\Registry\EventHandlerRegistryInterface;
 use App\Modules\Notification\Application\Messaging\Messages\EventBodyMessage;
+use App\Modules\Observability\Presentation\Interface\ObservabilityModuleInterface;
 use App\Modules\Subscription\Application\Messaging\Brokers\MessageBrokerInterface;
-use Illuminate\Support\Facades\Log;
 
-class EventConsumer implements EventConsumerInterface
+readonly class EventConsumer implements EventConsumerInterface
 {
-    private MessageBrokerInterface $broker;
-    private EventHandlerRegistryInterface $registry;
-    private EventHandlerExecutorInterface $executor;
-
     public function __construct(
-        MessageBrokerInterface $broker,
-        EventHandlerRegistryInterface $registry,
-        EventHandlerExecutorInterface $executor
+        private MessageBrokerInterface $broker,
+        private EventHandlerRegistryInterface $registry,
+        private EventHandlerExecutorInterface $executor,
+        private ObservabilityModuleInterface $monitor
     ) {
-        $this->broker = $broker;
-        $this->registry = $registry;
-        $this->executor = $executor;
     }
 
     public function consume(string $queue): void
@@ -54,12 +48,18 @@ class EventConsumer implements EventConsumerInterface
     {
         $eventType = $message->getEventType();
 
-        Log::info('Consuming event');
+        $this->monitor->logger()->logInfo('Consuming event', [
+            'module' => 'Notification',
+            'message' => $message->toArray(),
+        ]);
 
         if (!$this->registry->hasHandlers($eventType)) {
-            Log::info(
+            $this->monitor->logger()->logWarn(
                 'No handlers registered for event type',
-                ['event_type' => $eventType]
+                [
+                    'module' => 'Notification',
+                    'message' => $message->toArray(),
+                ]
             );
             return true;
         }
@@ -72,16 +72,18 @@ class EventConsumer implements EventConsumerInterface
                 $success = $this->executor->execute($handlerClass, $message);
                 $allSucceeded = $allSucceeded && $success;
 
-                Log::info('Event handler executed', [
-                    'handler' => $handlerClass,
+                $this->monitor->logger()->logInfo('Event handler executed', [
+                    'module' => 'Notification',
+                    'handler'    => $handlerClass,
                     'event_type' => $eventType,
-                    'success' => $success,
+                    'success'    => $success,
                 ]);
             } catch (\Exception $e) {
-                Log::error('Event handler failed', [
-                    'handler' => $handlerClass,
+                $this->monitor->logger()->logError('Event handler failed', [
+                    'module' => 'Notification',
+                    'handler'    => $handlerClass,
                     'event_type' => $eventType,
-                    'error' => $e->getMessage(),
+                    'error'      => $e->getMessage(),
                 ]);
                 $allSucceeded = false;
             }
