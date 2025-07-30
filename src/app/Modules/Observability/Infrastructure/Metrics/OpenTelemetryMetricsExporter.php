@@ -31,7 +31,10 @@ class OpenTelemetryMetricsExporter implements MetricsServiceInterface
      */
     private array $gauges = [];
     /**
-     * @var array<string, array{value: float, attributes: array<non-empty-string, array<mixed>|bool|float|int|string|null>}>
+     * @var array<string, array{
+     *     value: float,
+     *     attributes: array<non-empty-string, array<mixed>|bool|float|int|string|null>
+     * }>
      */
     private array $gaugeValues = [];
 
@@ -132,7 +135,11 @@ class OpenTelemetryMetricsExporter implements MetricsServiceInterface
                 continue;
             }
 
-            if (is_array($value) || is_bool($value) || is_float($value) || is_int($value) || is_string($value) || $value === null) {
+            if (
+                is_array($value) || is_bool($value)
+                || is_float($value) || is_int($value)
+                || is_string($value) || $value === null
+            ) {
                 $normalized[$key] = $value;
             } else {
                 if (is_object($value)) {

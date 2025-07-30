@@ -37,7 +37,9 @@ class WeatherStackRepository extends AbstractWeatherRepository
 
         if ($response->successful()) {
             $this->monitor->metrics()->incrementWeatherFetches(
-                $this->getProviderName(), $city->getName(), true
+                $this->getProviderName(),
+                $city->getName(),
+                true
             );
             return new WeatherData(
                 temperature: $data['current']['temperature'],
@@ -47,7 +49,9 @@ class WeatherStackRepository extends AbstractWeatherRepository
         }
 
         $this->monitor->metrics()->incrementWeatherFetches(
-            $this->getProviderName(), $city->getName(), false
+            $this->getProviderName(),
+            $city->getName(),
+            false
         );
 
         if (isset($data['error'])) {

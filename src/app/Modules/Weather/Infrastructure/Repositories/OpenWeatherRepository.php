@@ -31,7 +31,9 @@ class OpenWeatherRepository extends AbstractWeatherRepository
             $data = $response->json();
 
             $this->monitor->metrics()->incrementWeatherFetches(
-                $this->getProviderName(), $city->getName(), true
+                $this->getProviderName(),
+                $city->getName(),
+                true
             );
 
             return new WeatherData(
@@ -41,7 +43,9 @@ class OpenWeatherRepository extends AbstractWeatherRepository
             );
         } else {
             $this->monitor->metrics()->incrementWeatherFetches(
-                $this->getProviderName(), $city->getName(), false
+                $this->getProviderName(),
+                $city->getName(),
+                false
             );
 
             if ($this->hasNotFoundError([$response->status()])) {

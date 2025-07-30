@@ -37,7 +37,9 @@ class WeatherApiRepository extends AbstractWeatherRepository
             $data = $response->json();
 
             $this->monitor->metrics()->incrementWeatherFetches(
-                $this->getProviderName(), $city->getName(), true
+                $this->getProviderName(),
+                $city->getName(),
+                true
             );
 
             return new WeatherData(
@@ -47,7 +49,9 @@ class WeatherApiRepository extends AbstractWeatherRepository
             );
         } else {
             $this->monitor->metrics()->incrementWeatherFetches(
-                $this->getProviderName(), $city->getName(), false
+                $this->getProviderName(),
+                $city->getName(),
+                false
             );
             /**
              * @var array{error:array{code: int}} $data
