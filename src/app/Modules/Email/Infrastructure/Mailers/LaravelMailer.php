@@ -3,12 +3,16 @@
 namespace App\Modules\Email\Infrastructure\Mailers;
 
 use App\Modules\Email\Application\Mailers\MailerInterface;
+use App\Modules\Observability\Presentation\Interface\ObservabilityModuleInterface;
 use Illuminate\Mail\Mailable;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
-class LaravelMailer implements MailerInterface
+readonly class LaravelMailer implements MailerInterface
 {
+    public function __construct(
+        private ObservabilityModuleInterface $monitor
+    ) {
+    }
     /**
      * @param string $email
      * @param Mailable $mailable
@@ -20,7 +24,13 @@ class LaravelMailer implements MailerInterface
             Mail::to($email)->send($mailable);
             return true;
         } catch (\Throwable $e) {
-            Log::error("Failed to send email to {$email}: " . $e->getMessage());
+            $this->monitor->logger()->logError(
+                "Failed to send email to {$email}: " . $e->getMessage(),
+                [
+                    'module' => 'Email',
+                    'email' => $email
+                ]
+            );
             return false;
         }
     }

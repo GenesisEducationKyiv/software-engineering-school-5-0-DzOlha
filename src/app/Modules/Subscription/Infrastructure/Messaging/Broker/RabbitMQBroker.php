@@ -2,8 +2,8 @@
 
 namespace App\Modules\Subscription\Infrastructure\Messaging\Broker;
 
+use App\Modules\Observability\Presentation\Interface\ObservabilityModuleInterface;
 use App\Modules\Subscription\Application\Messaging\Brokers\MessageBrokerInterface;
-use Illuminate\Support\Facades\Log;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
@@ -17,8 +17,10 @@ class RabbitMQBroker implements MessageBrokerInterface
      * @throws \Exception
      * @param array<string, mixed> $config
      */
-    public function __construct(array $config)
-    {
+    public function __construct(
+        array $config,
+        private readonly ObservabilityModuleInterface $monitor
+    ) {
         /**
          * @var array{
          *     host: string,
@@ -92,15 +94,27 @@ class RabbitMQBroker implements MessageBrokerInterface
                 $result = $callback($messageData);
 
                 if ($result === true) {
+                    $this->monitor->logger()->logInfo(
+                        "Event has been consumed successfully",
+                        [
+                            'module' => 'Subscription',
+                            'queue' => $queue,
+                            'message' => $messageData
+                        ]
+                    );
                     $msg->ack();
                 } else {
                     $msg->nack(false, true); // Requeue for retry
                 }
             } catch (\Exception $e) {
-                Log::error('Message processing failed', [
-                    'error' => $e->getMessage(),
-                    'queue' => $queue,
-                ]);
+                $this->monitor->logger()->logError(
+                    'Message processing failed',
+                    [
+                        'module' => 'Subscription',
+                        'error' => $e->getMessage(),
+                        'queue' => $queue
+                    ]
+                );
                 $msg->nack(false, true);
             }
         };

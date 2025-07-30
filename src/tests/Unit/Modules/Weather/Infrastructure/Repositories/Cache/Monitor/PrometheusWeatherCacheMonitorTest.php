@@ -2,6 +2,8 @@
 
 namespace Tests\Unit\Modules\Weather\Infrastructure\Repositories\Cache\Monitor;
 
+use App\Modules\Observability\Application\Metrics\Collector\MetricsCollectorInterface;
+use App\Modules\Observability\Presentation\Interface\ObservabilityModuleInterface;
 use App\Modules\Weather\Infrastructure\Repositories\Cache\Monitor\PrometheusWeatherCacheMonitor;
 use Mockery;
 use Prometheus\CollectorRegistry;
@@ -41,7 +43,20 @@ class PrometheusWeatherCacheMonitorTest extends TestCase
             )
             ->andReturn($counterMock);
 
-        $monitor = new PrometheusWeatherCacheMonitor($registryMock);
+        $metricsMock = Mockery::mock(MetricsCollectorInterface::class);
+        $metricsMock->shouldReceive('incrementCacheHits')
+            ->once()
+            ->with('hit_total');
+
+        $observabilityMock = Mockery::mock(ObservabilityModuleInterface::class);
+        $observabilityMock->shouldReceive('metrics')
+            ->once()
+            ->andReturn($metricsMock);
+
+        $monitor = new PrometheusWeatherCacheMonitor(
+            $registryMock,
+            $observabilityMock
+        );
         $monitor->incrementHit($location, $type);
     }
 
@@ -69,7 +84,20 @@ class PrometheusWeatherCacheMonitorTest extends TestCase
             )
             ->andReturn($counterMock);
 
-        $monitor = new PrometheusWeatherCacheMonitor($registryMock);
+        $metricsMock = Mockery::mock(MetricsCollectorInterface::class);
+        $metricsMock->shouldReceive('incrementCacheMisses')
+            ->once()
+            ->with('miss_total');
+
+        $observabilityMock = Mockery::mock(ObservabilityModuleInterface::class);
+        $observabilityMock->shouldReceive('metrics')
+            ->once()
+            ->andReturn($metricsMock);
+
+        $monitor = new PrometheusWeatherCacheMonitor(
+            $registryMock,
+            $observabilityMock
+        );
         $monitor->incrementMiss($location, $type);
     }
 }

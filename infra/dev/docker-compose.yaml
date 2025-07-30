@@ -93,6 +93,7 @@ services:
       - "9090:9090"
     depends_on:
       - nginx
+      - otel-collector
 
   grafana:
     build:
@@ -133,6 +134,31 @@ services:
       - ./php/.env
     depends_on:
       - rabbitmq
+
+  otel-collector:
+    build:
+      context: ../../
+      dockerfile: infra/dev/otel/Dockerfile
+    ports:
+      - "4317:4317"
+      - "4318:4318"
+      - "9464:9464"     # Prometheus scrape
+
+  loki:
+    build:
+      context: ../../
+      dockerfile: infra/dev/loki/Dockerfile
+    ports:
+      - "3100:3100"
+
+  promtail:
+    build:
+      context: ../../
+      dockerfile: infra/dev/promtail/Dockerfile
+    volumes:
+      - ../../src/storage/logs:/var/log/app_logs
+    depends_on:
+      - loki
 
 volumes:
   pgdata:

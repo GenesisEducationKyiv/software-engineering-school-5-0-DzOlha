@@ -4,15 +4,14 @@ namespace App\Modules\Notification\Application\Jobs;
 
 use App\Modules\Notification\Domain\Entities\NotificationSubscriptionEntity;
 use App\Modules\Email\Presentation\Interface\EmailModuleInterface;
+use App\Modules\Observability\Presentation\Interface\ObservabilityModuleInterface;
 use App\Modules\Subscription\Presentation\Interface\SubscriptionModuleInterface;
 use App\Modules\Weather\Presentation\Interface\WeatherModuleInterface;
-use App\Modules\Subscription\Domain\Entities\Subscription;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Log;
 
 class SendWeatherUpdates implements ShouldQueue
 {
@@ -30,16 +29,27 @@ class SendWeatherUpdates implements ShouldQueue
     public function handle(
         WeatherModuleInterface $weatherModule,
         EmailModuleInterface $emailModule,
-        SubscriptionModuleInterface $subscriptionModule
+        SubscriptionModuleInterface $subscriptionModule,
+        ObservabilityModuleInterface $monitor
     ): void {
-        Log::info('Running weather update job', ['subscription_id' => $this->subscriptionId]);
+        $monitor->logger()->logInfo(
+            'Running weather update job',
+            [
+                'module' => $this->getModuleName(),
+                'subscription_id' => $this->subscriptionId,
+            ]
+        );
 
         $subscriptionExternal = $subscriptionModule->findSubscriptionEntityById($this->subscriptionId);
 
         if (!$subscriptionExternal || !$subscriptionExternal->isActive()) {
-            Log::info('Skipping weather update: inactive or missing subscription', [
-                'subscription_id' => $this->subscriptionId,
-            ]);
+            $monitor->logger()->logWarn(
+                'Skip sending weather update email: inactive or missing subscription',
+                [
+                    'module' => $this->getModuleName(),
+                    'subscription_id' => $this->subscriptionId,
+                ]
+            );
             return;
         }
 
@@ -56,7 +66,13 @@ class SendWeatherUpdates implements ShouldQueue
 
         $subscriptionId = $subscription->getId();
         if ($subscriptionId === null) {
-            Log::warning('Subscription ID is null, skipping dispatch');
+            $monitor->logger()->logWarn(
+                'Subscription ID is null, skipping dispatch',
+                [
+                    'module' => $this->getModuleName(),
+                    'subscription_id' => $this->subscriptionId
+                ]
+            );
             return;
         }
 
@@ -79,6 +95,13 @@ class SendWeatherUpdates implements ShouldQueue
         );
 
         if ($sent) {
+            $monitor->logger()->logInfo(
+                "Weather update email sent",
+                [
+                    'module' => $this->getModuleName(),
+                    'subscription_id' => $subscriptionId,
+                ]
+            );
             /**
              * @var int $intervalMinutes
              */
@@ -93,10 +116,22 @@ class SendWeatherUpdates implements ShouldQueue
              * Schedule the next update
              */
             self::dispatch($subscriptionId)->delay(now()->addMinutes($intervalMinutes));
+
+            $monitor->logger()->logInfo(
+                "The next weather update email scheduled",
+                [
+                    'module' => $this->getModuleName(),
+                    'subscription_id' => $subscriptionId,
+                ]
+            );
         } else {
-            Log::error('Failed to send weather update', [
-                'subscription_id' => $subscription->getId()
-            ]);
+            $monitor->logger()->logError(
+                'Failed to send weather update email',
+                [
+                    'module' => $this->getModuleName(),
+                    'subscription_id' => $subscription->getId()
+                ]
+            );
 
             /**
              * Update with error status and retry in 60 minutes
@@ -107,15 +142,32 @@ class SendWeatherUpdates implements ShouldQueue
                 false
             );
             if (!$updated) {
-                Log::error('Failed to update subscription email status', [
-                'subscription_id' => $subscription->getId()
-                ]);
+                $monitor->logger()->logError(
+                    'Failed to update subscription email status',
+                    [
+                        'module' => $this->getModuleName(),
+                        'subscription_id' => $subscription->getId()
+                    ]
+                );
             }
 
             /**
              * Retry
              */
             self::dispatch($subscriptionId)->delay(now()->addMinutes($this->retryMinutes));
+
+            $monitor->logger()->logError(
+                'Retry for sending weather update email is scheduled',
+                [
+                    'module' => $this->getModuleName(),
+                    'subscription_id' => $subscription->getId()
+                ]
+            );
         }
+    }
+
+    private function getModuleName(): string
+    {
+        return 'Notification';
     }
 }

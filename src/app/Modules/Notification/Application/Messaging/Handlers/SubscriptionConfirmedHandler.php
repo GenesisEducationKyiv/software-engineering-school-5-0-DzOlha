@@ -5,12 +5,12 @@ namespace App\Modules\Notification\Application\Messaging\Handlers;
 use App\Exceptions\ValidationException;
 use App\Modules\Notification\Application\Jobs\SendWeatherUpdates;
 use App\Modules\Notification\Application\Messaging\Messages\EventBodyMessage;
-use Illuminate\Support\Facades\Log;
 
 class SubscriptionConfirmedHandler extends EventHandler
 {
     /**
      * @throws ValidationException
+     * @throws \JsonException
      */
     public function handle(EventBodyMessage $eventData): void
     {
@@ -31,13 +31,22 @@ class SubscriptionConfirmedHandler extends EventHandler
         $subscriptionId = $payload['subscription']['id'];
 
         if ($subscriptionId === null) {
-            Log::error('Cannot dispatch SendWeatherUpdates: subscription has no ID');
+            $this->monitor->logger()->logWarn(
+                'Cannot process SubscriptionConfirmed event: subscription has no ID',
+                [
+                    'module' => 'Notification',
+                    'message' => $eventData->toArray(),
+                ]
+            );
             return;
         }
 
-        Log::info(
-            'SubscriptionConfirmed event received',
-            ['subscription_id' => $subscriptionId]
+        $this->monitor->logger()->logInfo(
+            'Valid SubscriptionConfirmed event received',
+            [
+                'module' => 'Notification',
+                'message' => $eventData->toArray(),
+            ]
         );
 
         SendWeatherUpdates::dispatch($subscriptionId);

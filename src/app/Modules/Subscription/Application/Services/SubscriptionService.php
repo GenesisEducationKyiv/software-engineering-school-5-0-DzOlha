@@ -8,6 +8,7 @@ use App\Exceptions\Custom\EmailAlreadySubscribedException;
 use App\Exceptions\Custom\FrequencyNotFoundException;
 use App\Exceptions\Custom\SubscriptionAlreadyPendingException;
 use App\Exceptions\Custom\TokenNotFoundException;
+use App\Modules\Observability\Presentation\Interface\ObservabilityModuleInterface;
 use App\Modules\Subscription\Application\DTOs\ConfirmSubscriptionRequestDTO;
 use App\Modules\Subscription\Application\DTOs\UnsubscribeRequestDTO;
 use App\Modules\Subscription\Application\Messaging\Publishers\EventPublisherInterface;
@@ -27,7 +28,8 @@ class SubscriptionService implements SubscriptionServiceInterface
         private readonly SubscriptionRepositoryInterface $subscriptionRepository,
         private readonly WeatherModuleInterface $weatherModule,
         private readonly TokenFactoryInterface $tokenFactory,
-        private readonly EventPublisherInterface $eventPublisher
+        private readonly EventPublisherInterface $eventPublisher,
+        private readonly ObservabilityModuleInterface $monitor
     ) {
     }
 
@@ -70,6 +72,13 @@ class SubscriptionService implements SubscriptionServiceInterface
             $subEntity->setConfirmationToken($newConfirmToken);
             $subEntity->setUnsubscribeToken($newCancelToken);
 
+            $this->monitor->logger()->logInfo(
+                "Renew activation link for a subscription",
+                [
+                    'subscription_id' => $subEntity->getId()
+                ]
+            );
+
             $this->eventPublisher->publish(new SubscriptionCreated($subEntity));
 
             return $subEntity;
@@ -81,6 +90,18 @@ class SubscriptionService implements SubscriptionServiceInterface
         $subscription = $this->subscriptionRepository->save($subEntity);
 
         $this->eventPublisher->publish(new SubscriptionCreated($subscription));
+
+        $this->monitor->logger()->logInfo(
+            "Subscription created",
+            [
+                'subscription_id' => $subscription->getId()
+            ]
+        );
+
+        $this->monitor->metrics()->incrementEmailSubscriptions(
+            $email->getValue(),
+            true
+        );
 
         return $subscription;
     }
@@ -95,10 +116,23 @@ class SubscriptionService implements SubscriptionServiceInterface
         );
 
         if (!$confirmedSubscription) {
+            $this->monitor->logger()->logError(
+                "Confirmation token not found",
+                [
+                    'confirmation_token' => $dto->confirmationToken
+                ]
+            );
             throw new TokenNotFoundException();
         }
 
         $this->eventPublisher->publish(new SubscriptionConfirmed($confirmedSubscription));
+
+        $this->monitor->logger()->logInfo(
+            "Subscription confirmed",
+            [
+                'subscription_id' => $confirmedSubscription->getId()
+            ]
+        );
 
         return $confirmedSubscription;
     }
@@ -113,8 +147,21 @@ class SubscriptionService implements SubscriptionServiceInterface
         );
 
         if (!$removedSubscription) {
+            $this->monitor->logger()->logError(
+                "Cancellation token not found",
+                [
+                    'cancel_token' => $dto->cancelToken
+                ]
+            );
             throw new TokenNotFoundException();
         }
+
+        $this->monitor->logger()->logInfo(
+            "Subscription canceled",
+            [
+                'subscription_id' => $removedSubscription->getId()
+            ]
+        );
 
         return true;
     }
