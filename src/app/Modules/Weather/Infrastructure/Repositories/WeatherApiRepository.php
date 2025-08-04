@@ -88,14 +88,7 @@ class WeatherApiRepository extends AbstractWeatherRepository
                 $this->logCityNotFound($city);
                 return false;
             }
-            $this->monitor->logger()->logError(
-                "API access error: {$this->getProviderName()}",
-                [
-                    'city' => $city->getName(),
-                    'module' => $this->getModuleName(),
-                    'provider' => $this->getProviderName(),
-                ]
-            );
+            $this->logApiAccessError($city);
             throw new ApiAccessException();
         }
     }

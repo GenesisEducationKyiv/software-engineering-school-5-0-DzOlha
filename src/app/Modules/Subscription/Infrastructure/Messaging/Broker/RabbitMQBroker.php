@@ -94,14 +94,6 @@ class RabbitMQBroker implements MessageBrokerInterface
                 $result = $callback($messageData);
 
                 if ($result === true) {
-                    $this->monitor->logger()->logInfo(
-                        "Event has been consumed successfully",
-                        [
-                            'module' => 'Subscription',
-                            'queue' => $queue,
-                            'message' => $messageData
-                        ]
-                    );
                     $msg->ack();
                 } else {
                     $msg->nack(false, true); // Requeue for retry

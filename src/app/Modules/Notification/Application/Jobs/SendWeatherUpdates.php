@@ -32,24 +32,9 @@ class SendWeatherUpdates implements ShouldQueue
         SubscriptionModuleInterface $subscriptionModule,
         ObservabilityModuleInterface $monitor
     ): void {
-        $monitor->logger()->logInfo(
-            'Running weather update job',
-            [
-                'module' => $this->getModuleName(),
-                'subscription_id' => $this->subscriptionId,
-            ]
-        );
-
         $subscriptionExternal = $subscriptionModule->findSubscriptionEntityById($this->subscriptionId);
 
         if (!$subscriptionExternal || !$subscriptionExternal->isActive()) {
-            $monitor->logger()->logWarn(
-                'Skip sending weather update email: inactive or missing subscription',
-                [
-                    'module' => $this->getModuleName(),
-                    'subscription_id' => $this->subscriptionId,
-                ]
-            );
             return;
         }
 
@@ -66,13 +51,6 @@ class SendWeatherUpdates implements ShouldQueue
 
         $subscriptionId = $subscription->getId();
         if ($subscriptionId === null) {
-            $monitor->logger()->logWarn(
-                'Subscription ID is null, skipping dispatch',
-                [
-                    'module' => $this->getModuleName(),
-                    'subscription_id' => $this->subscriptionId
-                ]
-            );
             return;
         }
 
@@ -95,13 +73,6 @@ class SendWeatherUpdates implements ShouldQueue
         );
 
         if ($sent) {
-            $monitor->logger()->logInfo(
-                "Weather update email sent",
-                [
-                    'module' => $this->getModuleName(),
-                    'subscription_id' => $subscriptionId,
-                ]
-            );
             /**
              * @var int $intervalMinutes
              */
@@ -116,14 +87,6 @@ class SendWeatherUpdates implements ShouldQueue
              * Schedule the next update
              */
             self::dispatch($subscriptionId)->delay(now()->addMinutes($intervalMinutes));
-
-            $monitor->logger()->logInfo(
-                "The next weather update email scheduled",
-                [
-                    'module' => $this->getModuleName(),
-                    'subscription_id' => $subscriptionId,
-                ]
-            );
         } else {
             $monitor->logger()->logError(
                 'Failed to send weather update email',
@@ -155,14 +118,6 @@ class SendWeatherUpdates implements ShouldQueue
              * Retry
              */
             self::dispatch($subscriptionId)->delay(now()->addMinutes($this->retryMinutes));
-
-            $monitor->logger()->logError(
-                'Retry for sending weather update email is scheduled',
-                [
-                    'module' => $this->getModuleName(),
-                    'subscription_id' => $subscription->getId()
-                ]
-            );
         }
     }
 

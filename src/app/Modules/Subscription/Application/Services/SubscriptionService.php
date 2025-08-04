@@ -72,13 +72,6 @@ class SubscriptionService implements SubscriptionServiceInterface
             $subEntity->setConfirmationToken($newConfirmToken);
             $subEntity->setUnsubscribeToken($newCancelToken);
 
-            $this->monitor->logger()->logInfo(
-                "Renew activation link for a subscription",
-                [
-                    'subscription_id' => $subEntity->getId()
-                ]
-            );
-
             $this->eventPublisher->publish(new SubscriptionCreated($subEntity));
 
             return $subEntity;
@@ -90,13 +83,6 @@ class SubscriptionService implements SubscriptionServiceInterface
         $subscription = $this->subscriptionRepository->save($subEntity);
 
         $this->eventPublisher->publish(new SubscriptionCreated($subscription));
-
-        $this->monitor->logger()->logInfo(
-            "Subscription created",
-            [
-                'subscription_id' => $subscription->getId()
-            ]
-        );
 
         $this->monitor->metrics()->incrementEmailSubscriptions(
             $email->getValue(),
@@ -127,13 +113,6 @@ class SubscriptionService implements SubscriptionServiceInterface
 
         $this->eventPublisher->publish(new SubscriptionConfirmed($confirmedSubscription));
 
-        $this->monitor->logger()->logInfo(
-            "Subscription confirmed",
-            [
-                'subscription_id' => $confirmedSubscription->getId()
-            ]
-        );
-
         return $confirmedSubscription;
     }
 
@@ -155,13 +134,6 @@ class SubscriptionService implements SubscriptionServiceInterface
             );
             throw new TokenNotFoundException();
         }
-
-        $this->monitor->logger()->logInfo(
-            "Subscription canceled",
-            [
-                'subscription_id' => $removedSubscription->getId()
-            ]
-        );
 
         return true;
     }

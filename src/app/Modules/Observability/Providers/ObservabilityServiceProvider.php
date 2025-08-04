@@ -6,12 +6,10 @@ use App\Modules\Observability\Application\Logging\LoggingServiceInterface;
 use App\Modules\Observability\Application\Metrics\Collector\MetricsCollector;
 use App\Modules\Observability\Application\Metrics\Collector\MetricsCollectorInterface;
 use App\Modules\Observability\Application\Metrics\MetricsServiceInterface;
-use App\Modules\Observability\Application\Services\ObservabilityServiceInterface;
 use App\Modules\Observability\Domain\Sampling\ConfigBasedSamplingStrategy;
 use App\Modules\Observability\Domain\Sampling\LogSamplingStrategyInterface;
 use App\Modules\Observability\Infrastructure\Logging\LokiLogger;
 use App\Modules\Observability\Infrastructure\Metrics\OpenTelemetryMetricsExporter;
-use App\Modules\Observability\Infrastructure\Services\ObservabilityService;
 use App\Modules\Observability\Presentation\Interface\ObservabilityModule;
 use App\Modules\Observability\Presentation\Interface\ObservabilityModuleInterface;
 use Illuminate\Support\ServiceProvider;
@@ -34,11 +32,6 @@ class ObservabilityServiceProvider extends ServiceProvider
             $endpoint = config('observability.otel.metrics_endpoint');
             return new OpenTelemetryMetricsExporter($endpoint);
         });
-
-        $this->app->singleton(
-            ObservabilityServiceInterface::class,
-            ObservabilityService::class
-        );
 
         $this->app->singleton(MetricsCollectorInterface::class, MetricsCollector::class);
         $this->app->singleton(ObservabilityModuleInterface::class, ObservabilityModule::class);

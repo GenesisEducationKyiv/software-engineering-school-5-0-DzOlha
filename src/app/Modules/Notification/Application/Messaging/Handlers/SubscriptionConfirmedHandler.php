@@ -31,23 +31,8 @@ class SubscriptionConfirmedHandler extends EventHandler
         $subscriptionId = $payload['subscription']['id'];
 
         if ($subscriptionId === null) {
-            $this->monitor->logger()->logWarn(
-                'Cannot process SubscriptionConfirmed event: subscription has no ID',
-                [
-                    'module' => 'Notification',
-                    'message' => $eventData->toArray(),
-                ]
-            );
             return;
         }
-
-        $this->monitor->logger()->logInfo(
-            'Valid SubscriptionConfirmed event received',
-            [
-                'module' => 'Notification',
-                'message' => $eventData->toArray(),
-            ]
-        );
 
         SendWeatherUpdates::dispatch($subscriptionId);
     }

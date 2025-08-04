@@ -29,15 +29,5 @@ readonly class EventPublisher implements EventPublisherInterface
             $message->toArray(),
             $message->getHeaders()
         );
-
-        $this->monitor->logger()->logInfo(
-            "Published event into the message broker",
-            [
-                'module' => 'Subscription',
-                'exchange' => $message->getExchange(),
-                'routingKey' => $message->getRoutingKey(),
-                'message' => $message->toArray()
-            ]
-        );
     }
 }

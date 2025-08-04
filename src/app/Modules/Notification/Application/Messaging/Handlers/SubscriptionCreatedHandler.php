@@ -44,23 +44,8 @@ class SubscriptionCreatedHandler extends EventHandler
         $id = $subscription->getId();
 
         if (!$id) {
-            $this->monitor->logger()->logWarn(
-                'Subscription ID is null',
-                [
-                    'module' => 'Notification',
-                    'message' => $eventData->toArray()
-                ]
-            );
             return;
         }
-
-        $this->monitor->logger()->logInfo(
-            'Valid SubscriptionCreated event received',
-            [
-                'module' => 'Notification',
-                'message' => $eventData->toArray()
-            ]
-        );
 
         $emailSent = $this->emailModule->sendConfirmationEmail(
             $this->emailModule->getEmailSubscriptionEntity(

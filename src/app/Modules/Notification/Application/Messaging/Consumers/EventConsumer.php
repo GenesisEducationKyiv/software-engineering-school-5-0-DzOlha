@@ -48,11 +48,6 @@ readonly class EventConsumer implements EventConsumerInterface
     {
         $eventType = $message->getEventType();
 
-        $this->monitor->logger()->logInfo('Consuming event', [
-            'module' => 'Notification',
-            'message' => $message->toArray(),
-        ]);
-
         if (!$this->registry->hasHandlers($eventType)) {
             $this->monitor->logger()->logWarn(
                 'No handlers registered for event type',
@@ -71,13 +66,6 @@ readonly class EventConsumer implements EventConsumerInterface
             try {
                 $success = $this->executor->execute($handlerClass, $message);
                 $allSucceeded = $allSucceeded && $success;
-
-                $this->monitor->logger()->logInfo('Event handler executed', [
-                    'module' => 'Notification',
-                    'handler'    => $handlerClass,
-                    'event_type' => $eventType,
-                    'success'    => $success,
-                ]);
             } catch (\Exception $e) {
                 $this->monitor->logger()->logError('Event handler failed', [
                     'module' => 'Notification',
