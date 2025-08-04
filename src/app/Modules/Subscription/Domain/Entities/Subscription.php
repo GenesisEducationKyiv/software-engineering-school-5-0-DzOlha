@@ -2,11 +2,14 @@
 
 namespace App\Modules\Subscription\Domain\Entities;
 
+use App\Exceptions\ValidationException;
 use App\Modules\Subscription\Domain\ValueObjects\Email\Email;
 use App\Modules\Subscription\Domain\ValueObjects\Frequency\Frequency;
 use App\Modules\Subscription\Domain\ValueObjects\Status\Status;
+use App\Modules\Subscription\Domain\ValueObjects\Token\Factory\TokenFactoryInterface;
 use App\Modules\Subscription\Domain\ValueObjects\Token\Token;
 use App\Modules\Subscription\Domain\ValueObjects\City\City;
+use App\Modules\Subscription\Domain\ValueObjects\Token\TokenType;
 
 class Subscription
 {
@@ -29,7 +32,7 @@ class Subscription
         return $this->id;
     }
 
-    public function setId(int $id): self
+    public function setId(?int $id): self
     {
         $this->id = $id;
         return $this;
@@ -60,7 +63,7 @@ class Subscription
         return $this->confirmationToken;
     }
 
-    public function setConfirmationToken(Token $token): self
+    public function setConfirmationToken(?Token $token): self
     {
         $this->confirmationToken = $token;
         return $this;
@@ -71,7 +74,7 @@ class Subscription
         return $this->unsubscribeToken;
     }
 
-    public function setUnsubscribeToken(Token $token): self
+    public function setUnsubscribeToken(?Token $token): self
     {
         $this->unsubscribeToken = $token;
         return $this;
@@ -129,8 +132,44 @@ class Subscription
                 'interval_minutes' => $this->frequency->getIntervalMinutes(),
             ],
             'status' => $this->status->getValue(),
-            'confirmation_token' => $this->confirmationToken?->__toString(),
-            'unsubscribe_token' => $this->unsubscribeToken?->__toString(),
+            'confirmation_token' => $this->confirmationToken?->getValue(),
+            'unsubscribe_token' => $this->unsubscribeToken?->getValue(),
         ];
+    }
+
+    /**
+     * @param array{
+     *     id: int|null,
+     *     email: string,
+     *     city: array{name: string},
+     *     frequency: array{id: int, name: string},
+     *     status: string,
+     *     confirmation_token: string|null,
+     *     unsubscribe_token: string|null
+     * } $data
+     * @throws ValidationException
+     */
+    public static function fromArray(array $data): self
+    {
+        $sub = new self(
+            new Email($data['email']),
+            new City($data['city']['name']),
+            Frequency::fromName($data['frequency']['name'], $data['frequency']['id']),
+            Status::fromString($data['status'])
+        );
+        $sub->setId($data['id']);
+
+        $confirmationToken = $data['confirmation_token'] !== null
+            ? new Token($data['confirmation_token'], TokenType::CONFIRM)
+            : null;
+
+        $unsubscribeToken = $data['unsubscribe_token'] !== null
+            ? new Token($data['unsubscribe_token'], TokenType::CANCEL)
+            : null;
+
+        $sub->setConfirmationToken($confirmationToken);
+        $sub->setUnsubscribeToken($unsubscribeToken);
+
+        return $sub;
     }
 }
