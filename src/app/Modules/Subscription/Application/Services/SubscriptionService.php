@@ -98,7 +98,7 @@ class SubscriptionService implements SubscriptionServiceInterface
             throw new TokenNotFoundException();
         }
 
-        $this->eventPublisher->publish(new SubscriptionConfirmed($confirmedSubscription));
+        $this->eventPublisher->publish(new SubscriptionConfirmed($confirmedSubscription->getId()));
 
         return $confirmedSubscription;
     }

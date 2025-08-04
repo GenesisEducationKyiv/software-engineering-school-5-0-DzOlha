@@ -4,8 +4,9 @@ namespace App\Modules\Notification\Application\Messaging\Handlers;
 
 use App\Exceptions\ValidationException;
 use App\Modules\Email\Presentation\Interface\EmailModuleInterface;
-use App\Modules\Notification\Application\Messaging\Messages\EventBodyMessage;
+use App\Modules\Notification\Application\Messaging\Messages\MessageBody;
 use App\Modules\Notification\Domain\Entities\NotificationSubscriptionEntity;
+use App\Modules\Subscription\Application\Messaging\Events\SubscriptionCreated;
 use App\Modules\Subscription\Presentation\Interface\SubscriptionModuleInterface;
 use Illuminate\Support\Facades\Log;
 
@@ -20,7 +21,7 @@ class SubscriptionCreatedHandler extends EventHandler
     /**
      * @throws ValidationException
      */
-    public function handle(EventBodyMessage $eventData): void
+    public function handle(MessageBody $eventData): void
     {
         /**
          * @var array{
@@ -36,8 +37,9 @@ class SubscriptionCreatedHandler extends EventHandler
          * } $payload
          */
         $payload = $eventData->getPayload();
+        $event = SubscriptionCreated::fromArray($payload);
 
-        $subscription = NotificationSubscriptionEntity::fromArray($payload['subscription']);
+        $subscription = NotificationSubscriptionEntity::fromArray($event->subscription->toArray());
         $id = $subscription->getId();
 
         if (!$id) {

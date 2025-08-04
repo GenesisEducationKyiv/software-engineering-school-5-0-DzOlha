@@ -2,7 +2,7 @@
 
 namespace App\Modules\Notification\Application\Messaging\Handlers;
 
-use App\Modules\Notification\Application\Messaging\Messages\EventBodyMessage;
+use App\Modules\Notification\Application\Messaging\Messages\MessageBody;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
@@ -20,7 +20,7 @@ abstract class EventHandler implements ShouldQueue
     public array $backoff = [10, 30, 60]; // Retry backoff in seconds
     public int $timeout = 300; // 5 minutes timeout
 
-    abstract public function handle(EventBodyMessage $eventData): void;
+    abstract public function handle(MessageBody $eventData): void;
 
     public function failed(\Throwable $exception): void
     {

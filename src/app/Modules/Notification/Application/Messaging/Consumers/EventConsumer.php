@@ -4,7 +4,7 @@ namespace App\Modules\Notification\Application\Messaging\Consumers;
 
 use App\Modules\Notification\Application\Messaging\Executors\EventHandlerExecutorInterface;
 use App\Modules\Notification\Application\Messaging\Handlers\Registry\EventHandlerRegistryInterface;
-use App\Modules\Notification\Application\Messaging\Messages\EventBodyMessage;
+use App\Modules\Notification\Application\Messaging\Messages\MessageBody;
 use App\Modules\Subscription\Application\Messaging\Brokers\MessageBrokerInterface;
 use Illuminate\Support\Facades\Log;
 
@@ -37,7 +37,7 @@ class EventConsumer implements EventConsumerInterface
                  *  } $messageData
                  */
                 return $this->handleMessage(
-                    new EventBodyMessage(
+                    new MessageBody(
                         $messageData['event_key'],
                         $messageData['event_type'],
                         $messageData['payload']
@@ -50,7 +50,7 @@ class EventConsumer implements EventConsumerInterface
     /**
      * @throws \JsonException
      */
-    private function handleMessage(EventBodyMessage $message): bool
+    private function handleMessage(MessageBody $message): bool
     {
         $eventType = $message->getEventType();
 
