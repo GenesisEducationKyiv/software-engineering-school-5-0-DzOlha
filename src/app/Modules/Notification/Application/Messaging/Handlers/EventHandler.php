@@ -25,7 +25,7 @@ abstract class EventHandler implements ShouldQueue
         protected readonly ObservabilityModuleInterface $monitor
     ) {
     }
-  
+
     abstract public function handle(MessageBody $eventData): void;
 
     public function failed(\Throwable $exception): void
