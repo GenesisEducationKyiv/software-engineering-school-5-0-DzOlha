@@ -14,8 +14,7 @@ readonly class EventPublisher implements EventPublisherInterface
     public function __construct(
         private MessageBrokerInterface $broker,
         private RoutingStrategyInterface $routingStrategy,
-        private EventKeyGeneratorInterface $keyGenerator,
-        private ObservabilityModuleInterface $monitor
+        private EventKeyGeneratorInterface $keyGenerator
     ) {
     }
 
