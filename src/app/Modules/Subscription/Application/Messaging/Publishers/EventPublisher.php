@@ -2,6 +2,7 @@
 
 namespace App\Modules\Subscription\Application\Messaging\Publishers;
 
+use App\Modules\Observability\Presentation\Interface\ObservabilityModuleInterface;
 use App\Modules\Subscription\Application\Messaging\Brokers\MessageBrokerInterface;
 use App\Modules\Subscription\Application\Messaging\Events\EventInterface;
 use App\Modules\Subscription\Application\Messaging\Generator\EventKeyGeneratorInterface;

@@ -2,6 +2,7 @@
 
 namespace App\Modules\Weather\Infrastructure\Repositories;
 
+use App\Modules\Observability\Presentation\Interface\ObservabilityModuleInterface;
 use App\Modules\Weather\Application\HttpClient\HttpClientInterface;
 use App\Modules\Weather\Domain\Repositories\WeatherRepositoryInterface;
 use App\Modules\Weather\Domain\ValueObjects\City\City;
@@ -15,7 +16,8 @@ abstract class AbstractWeatherRepository implements WeatherRepositoryInterface
     protected int $cityNotFoundCode = 404;
 
     public function __construct(
-        protected readonly HttpClientInterface $httpClient
+        protected readonly HttpClientInterface $httpClient,
+        protected readonly ObservabilityModuleInterface $monitor
     ) {
         /**
          * @var array{
@@ -56,6 +58,35 @@ abstract class AbstractWeatherRepository implements WeatherRepositoryInterface
          * @var array{code: ?int} $error
          */
         return $error['code'] === $this->cityNotFoundCode;
+    }
+
+    protected function getModuleName(): string
+    {
+        return 'Weather';
+    }
+
+    protected function logCityNotFound(City $city): void
+    {
+        $this->monitor->logger()->logError(
+            "City not found: {$city->getName()}",
+            [
+                'city' => $city->getName(),
+                'module' => $this->getModuleName(),
+                'provider' => $this->getProviderName(),
+            ]
+        );
+    }
+
+    protected function logApiAccessError(City $city): void
+    {
+        $this->monitor->logger()->logError(
+            "API access error: {$this->getProviderName()}",
+            [
+                'city' => $city->getName(),
+                'module' => $this->getModuleName(),
+                'provider' => $this->getProviderName(),
+            ]
+        );
     }
 
     abstract public function getProviderName(): string;
