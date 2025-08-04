@@ -2,9 +2,9 @@
 
 namespace App\Modules\Subscription\Application\Messaging\Publishers;
 
-use App\Modules\Subscription\Application\Messaging\Events\SubscriptionEvent;
+use App\Modules\Subscription\Application\Messaging\Events\EventInterface;
 
 interface EventPublisherInterface
 {
-    public function publish(SubscriptionEvent $event): void;
+    public function publish(EventInterface $event): void;
 }

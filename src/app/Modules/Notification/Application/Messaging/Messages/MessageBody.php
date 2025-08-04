@@ -2,7 +2,7 @@
 
 namespace App\Modules\Notification\Application\Messaging\Messages;
 
-readonly class EventBodyMessage
+readonly class MessageBody
 {
     /**
      * @param string $eventKey
@@ -32,18 +32,5 @@ readonly class EventBodyMessage
     public function getPayload(): array
     {
         return $this->payload;
-    }
-
-    /**
-     * @return array<string, mixed>
-     * @throws \JsonException
-     */
-    public function toArray(): array
-    {
-        return [
-            'event_key' => $this->eventKey,
-            'event_type' => $this->eventType,
-            'payload' => json_encode($this->payload, JSON_THROW_ON_ERROR)
-        ];
     }
 }

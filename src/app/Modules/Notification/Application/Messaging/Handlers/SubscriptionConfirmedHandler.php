@@ -2,33 +2,24 @@
 
 namespace App\Modules\Notification\Application\Messaging\Handlers;
 
-use App\Exceptions\ValidationException;
 use App\Modules\Notification\Application\Jobs\SendWeatherUpdates;
-use App\Modules\Notification\Application\Messaging\Messages\EventBodyMessage;
+use App\Modules\Notification\Application\Messaging\Messages\MessageBody;
+use App\Modules\Subscription\Application\Messaging\Events\SubscriptionConfirmed;
+use Illuminate\Support\Facades\Log;
 
 class SubscriptionConfirmedHandler extends EventHandler
 {
-    /**
-     * @throws ValidationException
-     * @throws \JsonException
-     */
-    public function handle(EventBodyMessage $eventData): void
+    public function handle(MessageBody $eventData): void
     {
         /**
          * @var array{
-         *     subscription: array{
-         *          id: int|null,
-         *          email: string,
-         *          city: array{name: string},
-         *          frequency: array{id: int, name: string},
-         *          status: string,
-         *          confirmation_token: string|null,
-         *          unsubscribe_token: string|null
-         *     }
+         *     subscription_id: int|null
          * } $payload
          */
         $payload = $eventData->getPayload();
-        $subscriptionId = $payload['subscription']['id'];
+        $event = SubscriptionConfirmed::fromArray($payload);
+
+        $subscriptionId = $event->subscriptionId;
 
         if ($subscriptionId === null) {
             return;

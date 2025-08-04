@@ -2,8 +2,8 @@
 
 namespace App\Modules\Notification\Application\Messaging\Handlers;
 
-use App\Modules\Notification\Application\Messaging\Messages\EventBodyMessage;
 use App\Modules\Observability\Presentation\Interface\ObservabilityModuleInterface;
+use App\Modules\Notification\Application\Messaging\Messages\MessageBody;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
@@ -25,8 +25,8 @@ abstract class EventHandler implements ShouldQueue
         protected readonly ObservabilityModuleInterface $monitor
     ) {
     }
-
-    abstract public function handle(EventBodyMessage $eventData): void;
+  
+    abstract public function handle(MessageBody $eventData): void;
 
     public function failed(\Throwable $exception): void
     {

@@ -61,7 +61,7 @@ class NotificationSubscriptionEntity
      *     id: int|null,
      *     email: string,
      *     city: array{name: string},
-     *     frequency: array{id: int, name: string},
+     *     frequency: array{id: int|null, name: string, interval_minutes: int},
      *     status: string,
      *     confirmation_token: string|null,
      *     unsubscribe_token: string|null

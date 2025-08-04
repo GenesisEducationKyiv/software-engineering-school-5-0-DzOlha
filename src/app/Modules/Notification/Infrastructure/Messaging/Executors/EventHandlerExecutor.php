@@ -3,7 +3,7 @@
 namespace App\Modules\Notification\Infrastructure\Messaging\Executors;
 
 use App\Modules\Notification\Application\Messaging\Executors\EventHandlerExecutorInterface;
-use App\Modules\Notification\Application\Messaging\Messages\EventBodyMessage;
+use App\Modules\Notification\Application\Messaging\Messages\MessageBody;
 use App\Modules\Notification\Application\Repositories\ProcessedEventsRepositoryInterface;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Container\Container;
@@ -19,7 +19,7 @@ readonly class EventHandlerExecutor implements EventHandlerExecutorInterface
     /**
      * @throws BindingResolutionException
      */
-    public function execute(string $handlerClass, EventBodyMessage $eventData): bool
+    public function execute(string $handlerClass, MessageBody $eventData): bool
     {
         $eventKey = $eventData->getEventKey();
         $eventType = $eventData->getEventType();
