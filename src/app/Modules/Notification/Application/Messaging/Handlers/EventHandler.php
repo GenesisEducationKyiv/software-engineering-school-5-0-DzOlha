@@ -7,7 +7,6 @@ use App\Modules\Notification\Application\Messaging\Messages\MessageBody;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Support\Facades\Log;
 
 abstract class EventHandler implements ShouldQueue
 {
@@ -30,10 +29,14 @@ abstract class EventHandler implements ShouldQueue
 
     public function failed(\Throwable $exception): void
     {
-        Log::error('Domain event handler failed', [
-            'handler' => static::class,
-            'exception' => $exception->getMessage(),
-            'trace' => $exception->getTraceAsString(),
-        ]);
+        $this->monitor->logger()->logError(
+            'Event handling failed',
+            [
+                'module' => 'Notification',
+                'message' => $exception->getMessage(),
+                'handler' => static::class,
+                'trace' => $exception->getTraceAsString(),
+            ]
+        );
     }
 }
