@@ -1,30 +1,141 @@
 parameters:
   paths:
-    - ./app
+    - ./app/Modules
+
+  exclude_files:
+    - '#.*Tests.*#'
+
   layers:
-    - name: Presentation
+    # =================== Subscription Module ===================
+    - name: SubscriptionPresentation
       collectors:
         - type: directory
-          value: "app/Presentation"
-    - name: Application
+          value: app/Modules/Subscription/Presentation
+
+    - name: SubscriptionApplication
       collectors:
         - type: directory
-          value: "app/Application"
-    - name: Domain
+          value: app/Modules/Subscription/Application
+
+    - name: SubscriptionDomain
       collectors:
         - type: directory
-          value: "app/Domain"
-    - name: Infrastructure
+          value: app/Modules/Subscription/Domain
+
+    - name: SubscriptionInfrastructure
       collectors:
         - type: directory
-          value: "app/Infrastructure"
+          value: app/Modules/Subscription/Infrastructure
+
+    # =================== Notification Module ===================
+    - name: NotificationPresentation
+      collectors:
+        - type: directory
+          value: app/Modules/Notification/Presentation
+
+    - name: NotificationApplication
+      collectors:
+        - type: directory
+          value: app/Modules/Notification/Application
+
+    - name: NotificationDomain
+      collectors:
+        - type: directory
+          value: app/Modules/Notification/Domain
+
+    - name: NotificationInfrastructure
+      collectors:
+        - type: directory
+          value: app/Modules/Notification/Infrastructure
+
+    # =================== Email Module ===================
+    - name: EmailPresentation
+      collectors:
+        - type: directory
+          value: app/Modules/Email/Presentation
+
+    - name: EmailApplication
+      collectors:
+        - type: directory
+          value: app/Modules/Email/Application
+
+    - name: EmailDomain
+      collectors:
+        - type: directory
+          value: app/Modules/Email/Domain
+
+    - name: EmailInfrastructure
+      collectors:
+        - type: directory
+          value: app/Modules/Email/Infrastructure
+
+    # =================== Weather Module ===================
+    - name: WeatherPresentation
+      collectors:
+        - type: directory
+          value: app/Modules/Weather/Presentation
+
+    - name: WeatherApplication
+      collectors:
+        - type: directory
+          value: app/Modules/Weather/Application
+
+    - name: WeatherDomain
+      collectors:
+        - type: directory
+          value: app/Modules/Weather/Domain
+
+    - name: WeatherInfrastructure
+      collectors:
+        - type: directory
+          value: app/Modules/Weather/Infrastructure
+
   ruleset:
-    Presentation:
-      - Application
-      - Domain
-    Application:
-      - Domain
-    Domain: ~
-    Infrastructure:
-      - Application
-      - Domain
+    # ----------------- Subscription -----------------
+    SubscriptionPresentation:
+      - SubscriptionApplication
+      - SubscriptionDomain
+    SubscriptionApplication:
+      - SubscriptionDomain
+      - WeatherPresentation # Cross-module allowed dependency
+    SubscriptionDomain: ~
+    SubscriptionInfrastructure:
+      - SubscriptionApplication
+      - SubscriptionDomain
+
+    # ----------------- Notification -----------------
+    NotificationPresentation:
+      - NotificationApplication
+      - NotificationDomain
+    NotificationApplication:
+      - NotificationDomain
+      - WeatherPresentation # Cross-module allowed dependency
+      - EmailPresentation # Cross-module allowed dependency
+      - SubscriptionPresentation  # Cross-module allowed dependency
+      - SubscriptionApplication  # Cross-module allowed dependency (events published)
+    NotificationDomain: ~
+    NotificationInfrastructure:
+      - NotificationApplication
+      - NotificationDomain
+
+    # ----------------- Email -----------------
+    EmailPresentation:
+      - EmailApplication
+      - EmailDomain
+    EmailApplication:
+      - EmailDomain
+    EmailDomain: ~
+    EmailInfrastructure:
+      - EmailApplication
+      - EmailDomain
+
+    # ----------------- Weather -----------------
+    WeatherPresentation:
+      - WeatherApplication
+      - WeatherDomain
+    WeatherApplication:
+      - WeatherDomain
+    WeatherDomain: ~
+    WeatherInfrastructure:
+      - WeatherApplication
+      - WeatherDomain
