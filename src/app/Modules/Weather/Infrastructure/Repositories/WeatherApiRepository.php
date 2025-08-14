@@ -36,19 +36,32 @@ class WeatherApiRepository extends AbstractWeatherRepository
              */
             $data = $response->json();
 
+            $this->monitor->metrics()->incrementWeatherFetches(
+                $this->getProviderName(),
+                $city->getName(),
+                true
+            );
+
             return new WeatherData(
                 temperature: $data['current']['temp_c'],
                 humidity: $data['current']['humidity'],
                 description: $data['current']['condition']['text'],
             );
         } else {
+            $this->monitor->metrics()->incrementWeatherFetches(
+                $this->getProviderName(),
+                $city->getName(),
+                false
+            );
             /**
              * @var array{error:array{code: int}} $data
              */
             $data = $response->json();
             if ($this->hasNotFoundError($data['error'])) {
+                $this->logCityNotFound($city);
                 throw new CityNotFoundException();
             }
+            $this->logApiAccessError($city);
             throw new ApiAccessException();
         }
     }
@@ -72,8 +85,10 @@ class WeatherApiRepository extends AbstractWeatherRepository
             $data = $response->json();
 
             if ($this->hasNotFoundError($data['error'])) {
+                $this->logCityNotFound($city);
                 return false;
             }
+            $this->logApiAccessError($city);
             throw new ApiAccessException();
         }
     }

@@ -122,6 +122,12 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_started
+      otel-collector:
+        condition: service_started
+      loki:
+        condition: service_started
+      promtail:
+        condition: service_started
     environment:
       BASE_URL: http://nginx:80/
 
@@ -147,6 +153,12 @@ services:
         condition: service_started
       rabbitmq:
         condition: service_started
+      otel-collector:
+        condition: service_started
+      loki:
+        condition: service_started
+      promtail:
+        condition: service_started
 
   # Unit tests (lightweight, no infra)
   unit-runner:
@@ -159,3 +171,28 @@ services:
       - ./php/.env.unit
     environment:
       INTEGRATION_MODE: "false"
+
+  otel-collector:
+    build:
+      context: ../../
+      dockerfile: infra/test/otel/Dockerfile
+    ports:
+      - "4317:4317"
+      - "4318:4318"
+      - "9464:9464"     # Prometheus scrape
+
+  loki:
+    build:
+      context: ../../
+      dockerfile: infra/test/loki/Dockerfile
+    ports:
+      - "3100:3100"
+
+  promtail:
+    build:
+      context: ../../
+      dockerfile: infra/test/promtail/Dockerfile
+    volumes:
+      - ../../src/storage/logs:/var/log/app_logs
+    depends_on:
+      - loki

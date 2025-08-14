@@ -11,6 +11,7 @@ use App\Modules\Notification\Application\Repositories\ProcessedEventsRepositoryI
 use App\Modules\Notification\Infrastructure\Messaging\Console\Commands\ConsumeEventsCommand;
 use App\Modules\Notification\Infrastructure\Messaging\Executors\EventHandlerExecutor;
 use App\Modules\Notification\Infrastructure\Repositories\ProcessedEventsRepository;
+use App\Modules\Observability\Presentation\Interface\ObservabilityModuleInterface;
 use App\Modules\Subscription\Application\Messaging\Brokers\MessageBrokerInterface;
 use App\Modules\Subscription\Application\Messaging\Generator\EventKeyGenerator;
 use App\Modules\Subscription\Application\Messaging\Generator\EventKeyGeneratorInterface;
@@ -33,7 +34,7 @@ class EventBusServiceProvider extends ServiceProvider
                 'user' => config('rabbitmq.user'),
                 'password' => config('rabbitmq.password'),
                 'vhost' => config('rabbitmq.vhost'),
-            ]);
+            ], $this->app->make(ObservabilityModuleInterface::class));
         });
 
         $this->app->singleton(RoutingStrategyInterface::class, ModuleBasedRoutingStrategy::class);

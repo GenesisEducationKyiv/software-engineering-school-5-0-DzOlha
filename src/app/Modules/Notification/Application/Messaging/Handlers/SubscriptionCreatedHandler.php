@@ -6,20 +6,23 @@ use App\Exceptions\ValidationException;
 use App\Modules\Email\Presentation\Interface\EmailModuleInterface;
 use App\Modules\Notification\Application\Messaging\Messages\MessageBody;
 use App\Modules\Notification\Domain\Entities\NotificationSubscriptionEntity;
+use App\Modules\Observability\Presentation\Interface\ObservabilityModuleInterface;
 use App\Modules\Subscription\Application\Messaging\Events\SubscriptionCreated;
 use App\Modules\Subscription\Presentation\Interface\SubscriptionModuleInterface;
-use Illuminate\Support\Facades\Log;
 
 class SubscriptionCreatedHandler extends EventHandler
 {
     public function __construct(
+        ObservabilityModuleInterface $monitor,
         private readonly EmailModuleInterface $emailModule,
         private readonly SubscriptionModuleInterface $subscriptionModule
     ) {
+        parent::__construct($monitor);
     }
 
     /**
      * @throws ValidationException
+     * @throws \JsonException
      */
     public function handle(MessageBody $eventData): void
     {
@@ -43,13 +46,8 @@ class SubscriptionCreatedHandler extends EventHandler
         $id = $subscription->getId();
 
         if (!$id) {
-            Log::warning('Subscription ID is null');
             return;
         }
-
-        Log::info('SubscriptionCreated event received', [
-            'subscription_id' => $id
-        ]);
 
         $emailSent = $this->emailModule->sendConfirmationEmail(
             $this->emailModule->getEmailSubscriptionEntity(
@@ -64,8 +62,12 @@ class SubscriptionCreatedHandler extends EventHandler
 
         if (!$emailSent) {
             $this->subscriptionModule->deleteSubscription($id);
-            Log::info(
-                "Subscription ID {$id} deleted due to failed confirmation email."
+            $this->monitor->logger()->logInfo(
+                "Subscription ID {$id} deleted due to failed confirmation email.",
+                [
+                    'module' => 'Notification',
+                    'message' => $eventData->toArray()
+                ]
             );
         }
     }

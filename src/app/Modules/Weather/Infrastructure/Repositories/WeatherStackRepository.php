@@ -36,6 +36,11 @@ class WeatherStackRepository extends AbstractWeatherRepository
         $data = $response->json();
 
         if ($response->successful()) {
+            $this->monitor->metrics()->incrementWeatherFetches(
+                $this->getProviderName(),
+                $city->getName(),
+                true
+            );
             return new WeatherData(
                 temperature: $data['current']['temperature'],
                 humidity: $data['current']['humidity'],
@@ -43,12 +48,20 @@ class WeatherStackRepository extends AbstractWeatherRepository
             );
         }
 
+        $this->monitor->metrics()->incrementWeatherFetches(
+            $this->getProviderName(),
+            $city->getName(),
+            false
+        );
+
         if (isset($data['error'])) {
             if ($this->hasNotFoundError($data['error'])) {
+                $this->logCityNotFound($city);
                 throw new CityNotFoundException();
             }
         }
 
+        $this->logApiAccessError($city);
         throw new ApiAccessException();
     }
 
@@ -69,10 +82,12 @@ class WeatherStackRepository extends AbstractWeatherRepository
         $data = $response->json();
         if (isset($data['error'])) {
             if ($this->hasNotFoundError($data['error'])) {
+                $this->logCityNotFound($city);
                 return false;
             }
         }
 
+        $this->logApiAccessError($city);
         throw new ApiAccessException();
     }
 }

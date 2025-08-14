@@ -90,6 +90,28 @@ parameters:
         - type: directory
           value: app/Modules/Weather/Infrastructure
 
+    # =================== Observability Module ===================
+    - name: ObservabilityPresentation
+      collectors:
+        - type: directory
+          value: app/Modules/Observability/Presentation
+
+    - name: ObservabilityApplication
+      collectors:
+        - type: directory
+          value: app/Modules/Observability/Application
+
+    - name: ObservabilityDomain
+      collectors:
+        - type: directory
+          value: app/Modules/Observability/Domain
+
+    - name: ObservabilityInfrastructure
+      collectors:
+        - type: directory
+          value: app/Modules/Observability/Infrastructure
+
+
   ruleset:
     # ----------------- Subscription -----------------
     SubscriptionPresentation:
@@ -98,10 +120,12 @@ parameters:
     SubscriptionApplication:
       - SubscriptionDomain
       - WeatherPresentation # Cross-module allowed dependency
+      - ObservabilityPresentation
     SubscriptionDomain: ~
     SubscriptionInfrastructure:
       - SubscriptionApplication
       - SubscriptionDomain
+      - ObservabilityPresentation
 
     # ----------------- Notification -----------------
     NotificationPresentation:
@@ -113,6 +137,7 @@ parameters:
       - EmailPresentation # Cross-module allowed dependency
       - SubscriptionPresentation  # Cross-module allowed dependency
       - SubscriptionApplication  # Cross-module allowed dependency (events published)
+      - ObservabilityPresentation
     NotificationDomain: ~
     NotificationInfrastructure:
       - NotificationApplication
@@ -128,6 +153,7 @@ parameters:
     EmailInfrastructure:
       - EmailApplication
       - EmailDomain
+      - ObservabilityPresentation
 
     # ----------------- Weather -----------------
     WeatherPresentation:
@@ -139,3 +165,15 @@ parameters:
     WeatherInfrastructure:
       - WeatherApplication
       - WeatherDomain
+      - ObservabilityPresentation
+
+    # ----------------- Observability -----------------
+    ObservabilityPresentation:
+      - ObservabilityApplication
+      - ObservabilityDomain
+    ObservabilityApplication:
+      - ObservabilityDomain
+    ObservabilityDomain: ~
+    ObservabilityInfrastructure:
+      - ObservabilityApplication
+      - ObservabilityDomain
