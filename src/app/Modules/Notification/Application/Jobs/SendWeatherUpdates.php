@@ -6,7 +6,6 @@ use App\Modules\Notification\Domain\Entities\NotificationSubscriptionEntity;
 use App\Modules\Email\Presentation\Interface\EmailModuleInterface;
 use App\Modules\Subscription\Presentation\Interface\SubscriptionModuleInterface;
 use App\Modules\Weather\Presentation\Interface\WeatherModuleInterface;
-use App\Modules\Subscription\Domain\Entities\Subscription;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -79,6 +78,9 @@ class SendWeatherUpdates implements ShouldQueue
         );
 
         if ($sent) {
+            /**
+             * @var int $intervalMinutes
+             */
             $intervalMinutes = $subscription->getIntervalMinutes();
 
             $subscriptionModule->updateSubscriptionEmailStatus(

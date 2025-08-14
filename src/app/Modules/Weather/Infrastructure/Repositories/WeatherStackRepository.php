@@ -23,31 +23,30 @@ class WeatherStackRepository extends AbstractWeatherRepository
             'query'      => $city->getName(),
         ]);
 
+        /**
+         * @var array{
+         *     current: array{
+         *          temperature: float,
+         *          humidity: float,
+         *          weather_descriptions: array<string>
+         *        },
+         *     error?: array{code: int}
+         *     } $data
+         */
+        $data = $response->json();
+
         if ($response->successful()) {
-            /**
-             * @var array{
-             *     current: array{
-             *          temperature: float,
-             *          humidity: float,
-             *          weather_descriptions: array<string>
-             *        },
-             *     error?: array{code: int}
-             *     } $data
-             */
-            $data = $response->json();
-
-            if (isset($data['error'])) {
-                if ($this->hasNotFoundError($data['error'])) {
-                    throw new CityNotFoundException();
-                }
-                throw new ApiAccessException();
-            }
-
             return new WeatherData(
                 temperature: $data['current']['temperature'],
                 humidity: $data['current']['humidity'],
                 description: $data['current']['weather_descriptions'][0] ?? 'No description',
             );
+        }
+
+        if (isset($data['error'])) {
+            if ($this->hasNotFoundError($data['error'])) {
+                throw new CityNotFoundException();
+            }
         }
 
         throw new ApiAccessException();
@@ -61,19 +60,17 @@ class WeatherStackRepository extends AbstractWeatherRepository
         ]);
 
         if ($response->successful()) {
-            /**
-             * @var array{error?: array{code: int}} $data
-             */
-            $data = $response->json();
-
-            if (isset($data['error'])) {
-                if ($this->hasNotFoundError($data['error'])) {
-                    return false;
-                }
-                throw new ApiAccessException();
-            }
-
             return true;
+        }
+
+        /**
+         * @var array{error?: array{code: int}} $data
+         */
+        $data = $response->json();
+        if (isset($data['error'])) {
+            if ($this->hasNotFoundError($data['error'])) {
+                return false;
+            }
         }
 
         throw new ApiAccessException();
